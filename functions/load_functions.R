@@ -1245,7 +1245,7 @@ clean_RKKP_CLL = function(data){
                                   M = 'Male',
                                   `F` = 'Female'),
               shak = Org_rap, 
-              hospital_id = recode_factor(Org_rap,
+              hospital = recode_factor(Org_rap,
                                           `1301101` = 'RH', 
                                           `1516230` = 'HER', 
                                           `2000228` = 'HIL',
@@ -1516,7 +1516,7 @@ clean_RKKP_LYFO_2024 = function(data){
   #' 
   #' Binary variables are encoded as "Yes" = 1 and "No" = 0. 
   #' Naming of variables is snake cased (spaces are replaced with _ and everything is lowercased if it is not an abbreviation)
-  #' Some variables are recorded in multiple forms (registration, treatment, relapse). When this is the case, a prefix indicates 
+  #' Some variables are recorded in multiple forms (registration, treatment, relapse). When this is the case, a suffix indicates 
   #' which form the variable is recorded from. If nothing else is stated the variable is from the registration form.
   
   #' 
