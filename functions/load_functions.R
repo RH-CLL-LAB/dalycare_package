@@ -17,6 +17,16 @@ Codes_SNOMED = CODES_SNOMED %>%
 #### FUNCTIONS #### 
 
 clean_lab_values = function(data, NPU = NPU, value = value, unit = unit){
+  #' Clean Lab Values
+  #' 
+  #' @description Cleans and converts common laboratory values with correct units based on NPU codes. 
+  #' E.g. B2M nmol/l converts to mg/l.
+  #' 
+  #' @examples
+  #' LAB_data = load_common_biochemistry(labs = “INFECTION”, combine = TRUE)
+  #' LAB_clean = clean_lab_values(LAB_data)
+  #' @export
+  #' @importFrom base paste
   NPUS = data %>% 
     select({{NPU}}) %>% 
     distinct() %>% 
@@ -127,6 +137,16 @@ clean_lab_values = function(data, NPU = NPU, value = value, unit = unit){
 }
 
 clean_RKKP_DAMYDA_snomed = function(data, snomed){
+  #' Clean RKKP DAMYDA SNOMED codes
+  #' 
+  #' @description Cleans SNOMED (or translates) codes in RKKP_DAMYDA. Works only for DAMYDA version 20 or higher
+  #' (https://www.rkkp-dokumentation.dk/Public/Default.aspx?msg=ChooseDB&error=WrongParm)
+  #' 
+  #' @examples
+  #' RKKP_DAMYDA %>% mutate(icd10 = clean_ RKKP_ DAMYDA_SNOMED(snomed = Reg_WHOHisto)
+
+  #' @export
+  #' @importFrom base paste
   data %>% 
     mutate(DX = recode_factor({{snomed}}, 
                               `9730` = 'DC900',
@@ -137,6 +157,16 @@ clean_RKKP_DAMYDA_snomed = function(data, snomed){
 }
 
 clean_RKKP_LYFO_snomed = function(data, snomed){
+  #' Clean RKKP LYFO SNOMED codes
+  #' 
+  #' @description Cleans (or translates) the dataset RKKP_LYFO. Works only for LYFO version 18 or higher, 
+  #' please see rkkp-documentation (https://www.rkkp-dokumentation.dk/Public/Default.aspx?msg=ChooseDB&error=WrongParm)
+  #' 
+  #' @examples
+  #' RKKP_LYFO %>% mutate(icd10 = clean_ RKKP_LYFO_SNOMED(snomed = Reg_WHOHisto)
+
+  #' @export
+  #' @importFrom base paste
   cat('\nclean_RKKP_LYFO_snomed works with Reg_WHOHistologikode1 + Reg_WHOHistologikode2\nPlease see subtype.\n')
   data %>% 
     mutate(SUBTYPE_detailed = recode_factor({{snomed}}, 
@@ -192,6 +222,18 @@ clean_RKKP_LYFO_snomed = function(data, snomed){
 ##### definitions #####
 
 CTCAE_lab = function(data, patientid, NPU, value, ref_lower, ref_upper, samplingdate) {
+  #' CTC Adverse Events from BioChemistry
+  #' 
+  #' @description Defines CTC adverse events (AE) from biochemistry. Works only with lab_forsker data.
+  #' SDS_lab_forsker data should be filtered to contain NPU of interest to avoid time-lapse.
+  #' E.g. May calculate ‘ANEMIA’, ‘THROMBOCYTOPENIA’, ‘DIC’, and ‘HEMOLYSIS’. 
+
+  #' 
+  #' @examples
+  #' SDS_lab_AE = SDS_lab_forsker %>% CTCAE_lab() 
+
+  #' @export
+  #' @importFrom base paste
   NPUS = data %>% pull({{NPU}}) %>% unique() %>% sort
   if(NPUS %in% 'NPU02319' %>% unique %>% sort %>% head(1)){
     data = data %>% 
@@ -277,6 +319,28 @@ CTCAE_lab = function(data, patientid, NPU, value, ref_lower, ref_upper, sampling
 }
 
 scr_low_48h <- function(dat) {
+  #' Lowest Serum Creatinine within 48 hours 
+  #' 
+  #' @description Defines lowest serum creatinine (scr) within 48 hours using lab_forsker data.
+  #' SDS_lab_forsker data should be filtered to contain creatinine only (NPU.KREA) to avoid time-lapse. 
+  #' Used to define acute kidney injury (AKI).
+
+
+  #' 
+  #' @examples
+  #' load_npu_common()
+  #' load_data(“SDS_lab_forsker”, c(NPU.KREA), ”analysiscode”) #loads creatinine
+  #' DATA_scr_low_48h = SDS_labforsker_subset %>% 
+  #' mutate(
+  #' cpr_enc = patientid, 
+  #' date_time = as.numeric(seconds(as.POSIXct(paste(samplingdate, samplingtime)))),
+  #' i.scr_inhos = 0
+  #' ) %>%
+  #' scr_low_48h() 
+
+
+  #' @export
+  #' @importFrom base paste
   out1 <- dat[dat, on = .(cpr_enc), allow.cartesian = TRUE
   ][
     order(cpr_enc, date_time) & i.date_time < date_time & i.date_time + 172800 >= date_time
@@ -289,6 +353,28 @@ scr_low_48h <- function(dat) {
 }
 
 scr_low_7d <- function(dat) {
+  #' Lowest Serum Creatinine within 7 Days
+  #' 
+  #' @description Defines lowest serum creatinine (scr) within 7 days using lab_forsker data.
+  #' SDS_lab_forsker data should be filtered to contain creatinine only (NPU.KREA) to avoid time-lapse.
+
+
+
+  #' 
+  #' @examples
+  #' load_npu_common()
+  #' load_data(“SDS_lab_forsker”, c(NPU.KREA), ”analysiscode”) #loads creatinine
+  #' DATA_scr_low_7d = SDS_labforsker_subset %>% 
+  #' mutate(
+  #' cpr_enc = patientid, 
+  #' date_time = as.numeric(seconds(as.POSIXct(paste(samplingdate, samplingtime)))),
+  #' i.scr_inhos = 0
+  #' ) %>%
+  #' scr_low_7d() 
+
+
+  #' @export
+  #' @importFrom base paste
   out1 <- dat[dat, on = .(cpr_enc), allow.cartesian = TRUE
   ][
     order(cpr_enc, date_time) & i.date_time < date_time & i.date_time + 604800 >= date_time
@@ -301,6 +387,26 @@ scr_low_7d <- function(dat) {
 }
 
 scr_base_median <- function(dat) {
+  #' Lowest Serum Creatinine Median
+  #' 
+  #' @description Defines baseline serum creatinine (BL scr) a rolling median using lab_forsker data.
+  #' SDS_lab_forsker data should be filtered to contain creatinine only (NPU.KREA) to avoid time-lapse.
+
+  #' 
+  #' @examples
+  #' load_npu_common()
+  #' load_data(“SDS_lab_forsker”, c(NPU.KREA), ”analysiscode”) #loads creatinine
+  #' DATA_scr_low_median = SDS_labforsker_subset %>% 
+  #' mutate(
+  #' cpr_enc = patientid, 
+  #' date_time = as.numeric(seconds(as.POSIXct(paste(samplingdate, samplingtime)))),
+  #' i.scr_inhos = 0
+  #' ) %>%
+  #' scr_base_median() 
+
+
+  #' @export
+  #' @importFrom base paste
   out1 <- dat[dat, on = .(cpr_enc), allow.cartesian = TRUE
   ][
     order(cpr_enc, date_time) & i.scr_inhos == 0 & (i.date_time < date_time-604800) & (i.date_time + 31557600 >= date_time)
@@ -315,7 +421,22 @@ scr_base_median <- function(dat) {
 
 
 AE_AKI = function(data, date = samplingdate, time = samplingtime, value = value, patientid=patientid, summary = TRUE){
-  
+  #' Acute Kidney Injury 
+  #' 
+  #' @description Defines acute kidney injury based on a 1.5x increase from the baseline serum creatinine (scr_base_median) within 7 days (scr_low_7d) or an absolute scr increase of 26.5 µmol/L within 48 hours (scr_low_48h) using lab_forsker data.
+  #' SDS_lab_forsker data should be filtered to contain creatinine only (NPU.KREA) to avoid time-lapse.
+
+
+  #' 
+  #' @examples
+  #' load_data(“SDS_lab_forsker”, c(NPU.KREA), ”analysiscode”) #loads creatinine
+  #' CREATININE_clean = SDS_labforsker_subset %>% clean_lab_values() 
+  #' AKI = CREATININE_clean %>%  AE_AKI(value = value2)
+  #' 
+  #' @references Carrero JJ et al. Kidney Int. 2023 Jan;103(1):53-69.
+
+  #' @export
+  #' @importFrom base paste
   load_dataset('PATIENT')
   dat = data %>%
     select(patientid = {{patientid}}, samplingdate = {{date}}, samplingtime = {{time}}, result = {{value}}) %>% 
@@ -401,31 +522,17 @@ AE_AKI = function(data, date = samplingdate, time = samplingtime, value = value,
 }
 
 TX_group <- function(data, protocol = protokol_navn) {
-    CLL_protocols = c('CLL, FORSØG', 'VISION/HO141', 'HOVON 158', 'ASSURE','GLOW', 'PREVENT-ACALL', 'CLL13', 'CLL14', 'CLL17', 'CLL18','CLL19', 'CLL20', 
-                      'VENICE', 'BELLWAVE', 'GCT3013-03', 'ACE-CL-311', 'LOXO-BTK', 'CLL-RT1')
-    LYFO_protocols = c('LYMFOM FORSØG', 'LYMFOM, DBLCL; FORSØG' , 'FORSØG LYMFOM',
-                       'LYMFOM, FORSØG', 'TRIANGLE', 'GCT3013-01', 'LYMFOM, LBL2018', 'LYMFOM, ALCL', 'LYMFOM, DLBCL FORSØG',
-                       'HCL, FORSØG ', 'FORSØG ENRICH', 'LYMFOM, EURO-LB', 'LYMFOM, EURONET' )
-    MM_protocols = c('MYELOMATOSE, FORSØG', 'MYELOMATOSE,FORSØG', 'AMYLOIDOSE, FORSØG', 'NMSG20/13', 'PCL, FORSØG ')
-    hem_protocols = c('ALL, ', 'ALL. NOPHO',  'ALL RECIDIV', 'AML, ', 'AML,D', 'AML,FORSØG', 'APLASTISK A', 'MDS, DECITABIN' , 'MDS, AZA', 'FLT3 AML', 'APL, TRISENOX', 
-                      'CCUS,' , 'MULTIPEL SCLEROSE', 'RESCUE VED EKSTRAVASATION',
-                      'MDS, FORSØG ', 'HÆM FORSØG GVH REACH', 'MDS, AZACITIDIN ', 'SKABELON TIL HÆMATOLOGISKE BEHANDLINGER', 'STØRRE KUTANE OG SUBKUTANE TUMORER')
-    other_protocols = c('ESOFAGUS', 'VENTRIKEL', 'MELANOM', 'COLORECTAL', 'BRYSTKRÆFT', 'SOLIDE TUMORER', 'HUDKRÆFT, ','BASALCELLE CARCINO',
-                        'MSI-HIGH CANCER',  'TVÆRGÅENDE, FORSØG',
-                        
-                        
-                        'NSCLC', 'ANAL CANCER', 'RECTUM CANCER', 'CHOLANGIOCARCINOM', 'ENDOKRIN, NET', 'THYMOM', 'CANCER THYREOIDEAE',
-                        'HOVED - HALS CANCER', 'REUMATOLOGI', 'GI, ',
-                        'CERVIX CANCER', 'OVARIE', 'CORPUS CANCER', 'CORPUSCANCER', ' SCLC', 'SCLC, ', 'EKSTRAPULMONAL SMÅCELLET', 'NYREKRÆFT',
-                        'GLIOMA',  'HJERNEKRÆFT','PANCREAS', 'LCNEC', 'URINVEJSKRÆFT', 'PROSTATA', 'PÆD, UDREDNING - DIAGNOSTISK MARV', 'MERKELCELLEKARCINOM',
-                        'HEPATOCELLULÆRT CARCINOM', 'MESOTHELIOM', 'AGGRESSIV FIBROMATOSE', 'SMÅCELLET KARCINOM', 'UROTELIALT KARCINOM', 'TESTIKELKRÆFT',
-                        'NET, ', 'NET G3', 'SARKOM', 'BLÆREKRÆFT', 'UKENDT PRIMÆR TUMOR', 'RENALCELLE CARCINOM',
-                        hem_protocols) 
-    HSCT = c('ALLO KMT', 'HÆM GVH REACH', 'KMT, FORSØG', 'CAR-T GMO ')
-    CART = c('CAR-T-CELLETERAPI', 'CAR-T-CELLETERAP', 'CAR-T-CELLETERAPI')
-    
-    R_mono = c('ITP, RITUXIMAB', 'RITUXIMAB X 4')
-    not_treatment = c('DENNE PT KAN HAVE EN AKTUEL BEHANDLINGSPLAN UNDER FANEN', 'NULL')
+  #' Treatment Groups
+  #' 
+  #' @description Groups treatment protocols into meaningful groups as class characters. 
+
+  #' 
+  #' @examples
+  #' SP_Behandlingsplaner_del1 %>% TX_group(protocol)
+  #' 
+
+  #' @export
+  #' @importFrom base paste
     data %>%
       filter(!grepl(not_treatment %>% paste0(collapse = '|'),{{protocol}})) %>%
       mutate(TX_group = ifelse(grepl('BENDAMUSTIN',{{protocol}}), 'BENDAMUSTIN', NA),
@@ -585,66 +692,18 @@ TX_group <- function(data, protocol = protokol_navn) {
 
 
 COD = function(data) {
-    #https://www.krebsdaten.de/Krebs/EN/Content/Methods/Coding_manual/coding_manual_node.html        
-    
-    HEM.CANCER = c('C81', 'C82', 'C83', 'C84', 'C85', 'C86', 'C87', 'C88',  'C89',  # == cHL
-                   'C90', 'C91', 'C92', 'C93', 'C94', 'C95', 'C96',
-                   'D45', 'D46', 'D47') 
-    SOLID.CANCER = c('C0','C1','C2','C3','C4','C5','C6','C7','C80', 'C97')
-    SLL.CLL = c('C911', 'C830')
-    INFECTION = c('A0', 'A1','A2','A3','A4','A5','A6','A7','A8','A9',
-                  'B0', 'B1','B2','B3','B4','B5','B6','B7','B8','B9',
-                  'J0', 'J1','J2',
-                  'R572')
-    NOT.ALLOWED = c('', 'U071', 'E869', 'J960', 'R092', 'R990', 'J969', 'R539', 'R649', 'E869', 'R999',
-                    'R589', 'R989', 'J961', 'J960', 'I959', 'I460') # SYMPTOMS
-    
-    # From Quan et al. Med Care. 2005;45:1130-9 
-    CCI.MI = c('I21', 'I22', 'I252')
-    CCI.CHF = c('I099', 'I110', 'I130', 'I132', 'I255', 'I420', 'I425','I426','I427','I428', 'I429', 'I43', 'I50', 'P290')
-    CCI.PAD = c('I70', 'I71', 'I731', 'I738', 'I739', 'I771', 'I790', 'I792', 'K551', 'K558', 'K559', 'Z958', 'Z959')
-    CCI.CVD = c('G45', 'G46', 'H340', 'I60','I61','I62','I63','I64','I65','I66','I67','I68', 'I69')
-    CCI.Dementia = c('F00', 'F01', 'F02', 'F03', 'F051', 'G30', 'G311')
-    CCI.CPD = c('I278', 'I279', 'J40', 'J41','J42','J43','J44','J45','J46', 'J47', 'J60','J61','J62','J63','J64','J65','J66', 'J67', 'J684', 'J701', 'J703')
-    CCI.Rheumatic = c('M05', 'M06', 'M315', 'M32', 'M33', 'M34', 'M351', 'M353', 'M360')
-    CCI.Ulcer = c('K25', 'K25', 'K25', 'K28')
-    CCI.Liver.Mild = c('B18', 'K700', 'K701', 'K702', 'K703', 'K709', 'K713','K714', 'K715', 'K717', 'K73', 'K74',
-                       'K760', 'K762', 'K763', 'K764', 'K768', 'K769', 'Z944')
-    CCI.Liver.Severe = c('I850', 'I859', 'I864', 'I982', 'K704', 'K711', 'K721', 'K729', 'K765', 'K766', 'K767')
-    CCI.DM.wo.compl = c('E100', 'E101', 'E106', 'E108', 'E109', 'E110', 'E111', 'E116', 'E118', 'E119',
-                        'E120', 'E121', 'E126', 'E128', 'E129', 'E130', 'E131', 'E136', 'E138', 'E139',
-                        'E140', 'E141', 'E146', 'E148', 'E149')
-    CCI.DM.w.compl = c('E102', 'E103', 'E104', 'E105', 'E107', 'E112', 'E113', 'E114', 'E115',
-                       'E117', 'E122', 'E125', 'E127', 'E132','E133','E134', 'E135', 'E137', 
-                       'E142', 'E143', 'E144', 'E145', 'E147')
-    CCI.Hemiplegia = c('G041', 'G114', 'G801', 'G802', 'G81',
-                       'G82', 'G830', 'G831', 'G832', 'G833', 'G834', 'G839')
-    CCI.Renal = c('I120', 'I131', 'N032', 'N033', 'N034', 'N035', 'N036', 'N037', 'N052',
-                  'N057', 'N18', 'N19', 'N250', 'Z490', 'Z491', 'Z492', 'Z940', 'Z992')
-    CCI.Cancer.and.Hem = c('C00', 'C01', 'C02', 'C03', 'C04', 'C05', 'C06', 'C07', 'C08', 'C09', 
-                           'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 
-                           'C20', 'C21', 'C22', 'C23', 'C24', 'C25', 'C26', 
-                           'C30', 'C31', 'C32', 'C33', 'C34', 'C37', 'C38', 'C39', 'C40', 'C41', 
-                           'C43', 'C45', 'C46', 'C47', 'C48', 'C49', 
-                           'C50', 'C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58',
-                           'C60', 'C61', 'C62', 'C63', 'C64', 'C65', 'C66', 'C67', 'C68', 'C69', 
-                           'C70', 'C71', 'C72', 'C73', 'C74', 'C75', 'C76', 
-                           'C81', 'C82', 'C83', 'C84', 'C85', 'C88',
-                           'C90', 'C91', 'C92', 'C93', 'C94', 'C95', 'C96', 'C97')
-    CCI.Cancer.Metastatic = c('C77', 'C78', 'C79', 'C80')
-    CCI.AIDS = c('B20', 'B21', 'B22', 'B24')
-    CANCER = c('C00', 'C01', 'C02', 'C03', 'C04', 'C05', 'C06', 'C07', 'C08', 'C09', 
-               'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 
-               'C20', 'C21', 'C22', 'C23', 'C24', 'C25', 'C26', 
-               'C30', 'C31', 'C32', 'C33', 'C34', 'C37', 'C38', 'C39', 'C40', 'C41', 
-               'C43', 'C45', 'C46', 'C47', 'C48', 'C49', 
-               'C50', 'C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58',
-               'C60', 'C61', 'C62', 'C63', 'C64', 'C65', 'C66', 'C67', 'C68', 'C69', 
-               'C70', 'C71', 'C72', 'C73', 'C74', 'C75', 'C76', 
-               'C81', 'C82', 'C83', 'C84', 'C85', 'C88',
-               'C90', 'C91', 'C92', 'C93', 'C94', 'C95', 'C96', 'C97')
-    HEM = c('C90', 'C910', 'C912', 'C913', 'C914', 'C915', 'C916', 'C917', 'C918','C919',  
-            'C90', 'C93', 'C94', 'C95', 'C96', 'C97') #Without CLL C911
+  #' Cause of Death (Depricated?)
+  #' 
+  #' @description Groups cause of death (COD) ICD10 codes into meaningful groups. Prioritizes infections.
+
+  #' 
+  #' @examples
+  #' SDS_t_dodsaarsag_2 %>%  COD()
+  #' 
+  #' @references Rotbain et al. Leukemia. 2021;35(9):2570-2580.
+
+  #' @export
+  #' @importFrom base paste       
     
     data %>%
       mutate(C_DOD_1A = ifelse(c_dod_1a %in% NOT.ALLOWED, c_dod_1b, c_dod_1a),
@@ -671,40 +730,18 @@ COD = function(data) {
 
 
 COD2  = function(data){
-  death.malign.hem = c('C81','C82','C83','C84','C85','C86','C87','C88','C89',
-                       'C90','C91','C92','C93','C94','C95','C96',
-                       'D45','D46','D47')
-  
-  death.malign.oth = c('C00','C01','C02','CO3','C04','C05','C06','C07','C08','C09',
-                       'C10','C11','C12','C13','C14','C15','C16','C17','C18','C19', 
-                       'C20','C21','C22','C23','C24','C25','C26','C27','C28','C29',
-                       'C30','C31','C32','C33','C34','C35','C36','C37','C38','C39',
-                       'C40','C41','C42','C43','C44','C45','C46','C47','C48','C49',
-                       'C50','C51','C52','C53','C54','C55','C56','C57','C58','C59',
-                       'C60','C61','C66','C63','C64','C65','C66','C67','C68','C69',
-                       'C70','C71','C72','C73','C74','C75','C76','C77','C78','C79',
-                       'C80','C97')
-  
-  death.inf = c('A0','A1','A2','A3','A4','A5','A6','A7','A8','A9',
-                'B0','B1','B2','B3','B4','B5','B6','B7','B8','B9', 
-                'D733','E060','E321', 
-                'G00','G01','G02','G038','G039','G04','G05','G06','G07','G08','G09',
-                'H00','H010','H03','H043','H050','H061','H100','H105','H106','H107','H108','H109','H130','H131','H150','H151','H190','H191','H192','H200','H220','H320','H440','H441','H600','H601','H603','H620','H621','H622','H623','H624','H660','H664','H670','H671','H700','H750',
-                'I301','I320','I321','I330','I339','I400','I410', 'I411', 'I412','I430','I681','I980',
-                'I981', 'J0','J1','J20','J21','J22','J36','J390','J391','J65','J851','J852','J853','J854','J855','J856','J857','J858','J859','J86',
-                'K046','K047','K052','K113','K122','K230','K35','K570','K572','K574','K578','K61','K630','K650','K659','K67','K750','K770','K810','K871',
-                'L00','L01','L02','L03','L04','L05','L06','L07','L08',
-                'M00','M01','M600','M608','M630','M631','M632','M860','M861','M868','M869',
-                'N00','N01','N080','N10','N151','N160','N290','N291','N300','N308','N33','N340','N370','N390','N410','N412','N431','N45','N481','N482','N492','N499','N51','N61','N700','N710','N72','N730','N733','N740','N741','N742','N743','N744','N751','N752','N753','N754','N755','N756','N757','N758','N760','N762','N764','N768','N770','N771',
-                'O23','O753','O85','O86','O91','O98',
-                'R650','R651',
-                'T802','T814')
-  
-  death.card= c('I01','I020', 'I05', 'I06', 'I07', 'I08', 'I09', 'I10', 'I11', 'I13', 'I20', 'I21', 'I22', 'I23', 'I24', 'I25', 'I26', 'I27', 'I28', 
-                'I302', 'I303', 'I304', 'I305', 'I306', 'I307', 'I308', 'I309', 'I31', 'I321', 'I322', 'I323', 'I324', 'I325', 'I326', 'I327', 'I328', 'I329', 'I331', 'I332',  'I333', 'I334', 'I335', 'I336', 'I337', 'I338', 'I401', 'I402', 'I403', 'I404', 'I405', 'I406', 'I407', 'I408', 'I409', 'I413', 'I414', 'I415', 'I416', 'I417', 'I418', 'I419', 'I42', 'I431', 'I432', 'I433', 'I434', 'I435', 'I436', 'I438', 'I439', 'I45', 'I46', 'I47', 'I48', 'I49', 'I51', 'I52', 
-                'I70', 'I71', 'I72', 'I731', 'I738', 'I739', 'I74', 'I771', 'I790', 'I792')      
-  
-  death.cer=c('G45', 'G46', 'H340', 'I6')
+  #' Cause of Death 
+  #' 
+  #' @description Groups cause of death (COD) ICD10 codes into meaningful groups. Prioritizes infections.
+
+  #' 
+  #' @examples
+  #' SDS_t_dodsaarsag_2 %>%  COD2()
+  #' 
+  #' @references Rotbain et al. Leukemia. 2021;35(9):2570-2580.
+
+  #' @export
+  #' @importFrom base paste 
   
   SDS_t_dodsaarsag_2 %>% names
   # assign death causes: CLL related death = 1, CLL unrelated death = 2
@@ -741,53 +778,26 @@ COD2  = function(data){
 
 
 CCI = function(data, patientid, icd10, exclude_CLL_score = FALSE, include_LC_score = FALSE) {
-  
-  
-  cat('\nQuan et al. Med Care. 2005;45:1130-9\nQuan et al. Am J Epidemiol. 2011;173:676-82')
-    # From Quan et al. Med Care. 2005;45:1130-9 
-    CCI.MI = c('I21', 'I22', 'I252')
-    CCI.CHF = c('I099', 'I110', 'I130', 'I132', 'I255', 'I420', 'I425','I426','I427','I428', 'I429', 'I43', 'I50', 'P290')
-    CCI.PAD = c('I70', 'I71', 'I731', 'I738', 'I739', 'I771', 'I790', 'I792', 'K551', 'K558', 'K559', 'Z958', 'Z959')
-    CCI.CVD = c('G45', 'G46', 'H340', 'I60','I61','I62','I63','I64','I65','I66','I67','I68', 'I69')
-    CCI.Dementia = c('F00', 'F01', 'F02', 'F03', 'F051', 'G30', 'G311')
-    CCI.CPD = c('I278', 'I279', 'J40', 'J41','J42','J43','J44','J45','J46', 'J47', 'J60','J61','J62','J63','J64','J65','J66', 'J67', 'J684', 'J701', 'J703')
-    CCI.Rheumatic = c('M05', 'M06', 'M315', 'M32', 'M33', 'M34', 'M351', 'M353', 'M360')
-    CCI.Ulcer = c('K25', 'K25', 'K25', 'K28')
-    CCI.Liver.Mild = c('B18', 'K700', 'K701', 'K702', 'K703', 'K709', 'K713','K714', 'K715', 'K717', 'K73', 'K74',
-                       'K760', 'K762', 'K763', 'K764', 'K768', 'K769', 'Z944')
-    CCI.Liver.Severe = c('I850', 'I859', 'I864', 'I982', 'K704', 'K711', 'K721', 'K729', 'K765', 'K766', 'K767')
-    CCI.DM.wo.compl = c('E100', 'E101', 'E106', 'E108', 'E109', 'E110', 'E111', 'E116', 'E118', 'E119',
-                        'E120', 'E121', 'E126', 'E128', 'E129', 'E130', 'E131', 'E136', 'E138', 'E139',
-                        'E140', 'E141', 'E146', 'E148', 'E149')
-    CCI.DM.w.compl = c('E102', 'E103', 'E104', 'E105', 'E107', 'E112', 'E113', 'E114', 'E115',
-                       'E117', 'E122', 'E125', 'E127', 'E132','E133','E134', 'E135', 'E137', 
-                       'E142', 'E143', 'E144', 'E145', 'E147')
-    CCI.Hemiplegia = c('G041', 'G114', 'G801', 'G802', 'G81',
-                       'G82', 'G830', 'G831', 'G832', 'G833', 'G834', 'G839')
-    CCI.Renal = c('I120', 'I131', 'N032', 'N033', 'N034', 'N035', 'N036', 'N037', 'N052',
-                  'N057', 'N18', 'N19', 'N250', 'Z490', 'Z491', 'Z492', 'Z940', 'Z992')
-    CCI.Cancer.and.Hem = c('C00', 'C01', 'C02', 'C03', 'C04', 'C05', 'C06', 'C07', 'C08', 'C09', 
-                           'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 
-                           'C20', 'C21', 'C22', 'C23', 'C24', 'C25', 'C26', 
-                           'C30', 'C31', 'C32', 'C33', 'C34', 'C37', 'C38', 'C39', 'C40', 'C41', 
-                           'C43', 'C45', 'C46', 'C47', 'C48', 'C49', 
-                           'C50', 'C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58',
-                           'C60', 'C61', 'C62', 'C63', 'C64', 'C65', 'C66', 'C67', 'C68', 'C69', 
-                           'C70', 'C71', 'C72', 'C73', 'C74', 'C75', 'C76', 
-                           'C81', 'C82', 'C83', 'C84', 'C85', 'C88',
-                           'C90', 'C91', 'C92', 'C93', 'C94', 'C95', 'C96', 'C97')
-    CCI.Cancer.Metastatic = c('C77', 'C78', 'C79', 'C80')
-    CCI.AIDS = c('B20', 'B21', 'B22', 'B24')
-    CANCER = c('C00', 'C01', 'C02', 'C03', 'C04', 'C05', 'C06', 'C07', 'C08', 'C09', 
-               'C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 
-               'C20', 'C21', 'C22', 'C23', 'C24', 'C25', 'C26', 
-               'C30', 'C31', 'C32', 'C33', 'C34', 'C37', 'C38', 'C39', 'C40', 'C41', 
-               'C43', 'C45', 'C46', 'C47', 'C48', 'C49', 
-               'C50', 'C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58',
-               'C60', 'C61', 'C62', 'C63', 'C64', 'C65', 'C66', 'C67', 'C68', 'C69', 
-               'C70', 'C71', 'C72', 'C73', 'C74', 'C75', 'C76', 
-               'C81', 'C82', 'C83', 'C84', 'C85', 'C88',
-               'C90', 'C91', 'C92', 'C93', 'C94', 'C95', 'C96', 'C97')
+  #' Charlson Comorbidity Index (CCI) 
+  #' 
+  #' @description Calculates Charlson comorbidity index (CCI) scores from ICD10 codes. 
+  #' Specifying CLL_include = FALSE omits the DC911 score.
+
+
+  #' 
+  #' @examples
+  #' SDS_t_adm %>% CCI()
+  #' diagnosis_all %>% CCI(patientid = patientid, icd10 = diagnosis)
+
+  #' 
+  #' @references 
+  #' Quan et al. Med Care. 2005;45:1130-9 as CCI.score
+  #' Quan et al. Am J Epidemiol. 2011;173:676-82 for CCI.2011.update
+
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
     if(exclude_CLL_score){
       CCI.Cancer.and.Hem  = c(CCI.Cancer.and.Hem[CCI.Cancer.and.Hem !='C91'], 
                               c('C90', 'C92', 'C93', 'C94', 'C95', 'C96', 'C97', 'C98', 'C99'))
@@ -841,12 +851,26 @@ CCI = function(data, patientid, icd10, exclude_CLL_score = FALSE, include_LC_sco
   
 }
 
-
-
 ATC_polypharmacy = function(data, 
                             patientid = patientid,
                             atc = atc,
                             level = 3){
+
+  #' ATC Codes Polypharmacy
+  #' 
+  #' @description Calculates number of 1st to 5th level ATC codes per patient and defines polypharmacy as ≥5 drug classes.
+
+
+  #' 
+  #' @examples
+  #' SDS_epikur %>% ATC_polypharmacy(level = 3) 
+
+  #' 
+  #' @references Brieghel et al. ASH annual meeting 2023. P5133
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
   
   POLYPH = data %>% 
     mutate(atc = substr({{atc}}, 1,3)) %>% 
@@ -872,16 +896,18 @@ ATC_polypharmacy = function(data,
 }
   
 ATC_AB <- function(data, atc) {
-    narrow = paste0('^', c("J01CE","J01CF","J01EA","J01EB","J01FA","J01XA","J01XC","J01XE","J01XD01","P01AB01","J01FF"))
-    broad = paste0('^', c("J01AA","J01CA","J01CR","J01M","J01DB","J01DC","J01DD","J01DH","J01EE","J01XX08","J01XX05"))
-    bactericidal = paste0('^', c("J01CE","J01CF","J01XA","J01CA","J01CR","J01M","J01XD01","P01AB01",
-                                 "J01DB","J01DC","J01DD","J01DH","J01XX08"))
-    bacteriostatic = paste0('^', c("J01EA","J01EB","J01FA","J01XC","J01XE","J01AA","J01EE","J01FF","J01XX05","J01BA"))
-    antiviral = "^J05A" 
-    antimycotics = "^J02A"
-    antihelminitics = "^P02C"
-    AB.ATC = c(narrow, broad, bactericidal, bacteriostatic, antiviral, antimycotics, antihelminitics) %>% unique
-    
+  #' ATC Antimicrobials
+  #' 
+  #' @description Subsets and groups all antimicrobials. 
+
+  #' 
+  #' @examples
+  #' SDS_epikur %>% ATC_AB()
+  #' SP_Administreret_Medicin %>% ATC_AB()
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
     data %>%
       filter(str_detect({{atc}}, str_flatten(AB.ATC, '|'))) %>% 
       mutate(AB.GROUP = ifelse(str_detect({{atc}}, str_flatten(narrow, '|')), 'Narrow antibiotics', NA),
@@ -1027,6 +1053,17 @@ ATC_AB <- function(data, atc) {
                                          P02CX01  = 'Pyrvinium'))}
   
 ATC_opioids <- function(data, atc) {
+  #' ATC Opioids
+  #' 
+  #' @description Subsets and groups all opioids. 
+
+  #' 
+  #' @examples
+  #' SDS_epikur %>%  ATC_opioids()
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
     data %>%
       filter({{atc}} %in% c("R05DA04", 'N02AX02', "N02AA01", 'N02AA05', "N02AE01", "N02AB03")) %>% 
       mutate(ATC_opioids = recode_factor({{atc}},
@@ -1039,8 +1076,19 @@ ATC_opioids <- function(data, atc) {
 }
 
 ATC_hypertensives <- function(data, atc) {
-    ATCS = paste0('^', c('C03', 'C07A', 'C08', 'C09', 'C09XA',
-                         'C02AB', 'C02AC', 'C02CA', 'G04CA', 'C02DB', 'C02DD'))
+  #' ATC Antihypertensive
+  #' 
+  #' @description Subsets and groups all antihypertensive drugs. 
+
+  #' 
+  #' @examples
+  #'SDS_epikur %>% ATC_hypertensives()
+  #'SP_Administreret_Medicin %>% ATC_hypertensives ()
+
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
     data %>% 
       filter(str_detect({{atc}}, str_flatten(ATCS, '|'))) %>% 
       mutate(HTN.GROUP = ifelse(str_detect({{atc}}, '^C03'), 'Diuretics', NA),
@@ -1062,6 +1110,17 @@ qSOFA = function(data,
                  patientid = patientid, 
                  recorded_time = recorded_time,
                  extended = T){
+  #' qSOFA Scores
+  #' 
+  #' @description Calculates qSOFA scores from vital values assuming that AVPU less than alert replaces GCS < 15.
+
+  #' 
+  #' @examples
+  #'SP_VitaleVaerdier %>% qSOFA()
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
   data = data %>% 
     select(patientid, Date_vital = recorded_time, displayname , value = meas_value_clean) %>% 
     mutate(qsofa_V = recode(displayname, 
@@ -1113,6 +1172,19 @@ qSOFA = function(data,
 
 
 filter_virus = function(data, komponentnavn = komponentnavn, resultat = pr_veresultat) {
+  #' Filter and subset viruses 
+  #' 
+  #' @description Subsets RSV, SARS-CoV-2 (SARS) and seasonal influenza (FLU) into class character.
+
+  #' 
+  #' @examples
+  #'SP_Bloddyrkning_del1 %>% filter_virus()
+  #' 
+  #' @references Niemann et al. Blood. Aug 4 2022;140(5):445-450.
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
   data %>% 
     filter(str_detect({{komponentnavn}}, str_flatten(c('INFLUENZA', 'SYNCYTIALVIRUS', 'SARS'), '|'))) %>% 
     mutate(resultat =  gsub('\\,', '', gsub(':', '', gsub('=', '', toupper({{resultat}})))),
@@ -1133,6 +1205,19 @@ filter_virus = function(data, komponentnavn = komponentnavn, resultat = pr_veres
 } 
 
 clean_RKKP_CLL = function(data){
+  #' Clean RKKP CLL
+  #' 
+  #' @description Cleans the dataset RKKP_CLL. Works only for CLL registry version 15 or higher. 
+  #' 
+  #' @note For documentation please see rkkp-documentation (https://www.rkkp-dokumentation.dk/Public/Default.aspx?msg=ChooseDB&error=WrongParm)
+
+  #' 
+  #' @examples
+  #'RKKP_CLL_CLEAN = RKKP_CLL %>% clean_ RKKP_CLL()
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
   load_dataset(c('PATIENT', 'LAB_IGHVIMGT'))
   data %>% 
     left_join(PATIENT, 'patientid') %>% #
@@ -1218,6 +1303,19 @@ clean_RKKP_CLL = function(data){
 }
 
 clean_RKKP_DAMYDA = function(data){
+  #' Clean RKKP DAMYDA
+  #' 
+  #' @description Cleans (or translates) the dataset RKKP_DAMYDA. Works only for DAMYDA version 18 or higher.
+  #' 
+  #' @note For documentation please see rkkp-documentation (https://www.rkkp-dokumentation.dk/Public/Default.aspx?msg=ChooseDB&error=WrongParm)
+
+  #' 
+  #' @examples
+  #'RKKP_DAMYDA_CLEAN = RKKP_DAMYDA %>% clean_ RKKP_DAMYDA()
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
   load_dataset(c('PATIENT'))
   data %>% 
     mutate(across(contains('Cyto_FishResultat'), ~ ifelse(is.na(.), 'N', .))) %>% 
@@ -1288,6 +1386,21 @@ clean_RKKP_DAMYDA = function(data){
 }
 
 clean_RKKP_LYFO = function(data){
+  #' Clean RKKP LYFO (Deprecated)
+  #' 
+  #' @description Cleans (or translates) the dataset RKKP_LYFO. Works only for LYFO version 20 or higher. 
+  #' 
+  #' @note 
+  #' Deprecated. See clean_RKKP_LYFO_2024() for an updated version. 
+  #' For documentation please see rkkp-documentation (https://www.rkkp-dokumentation.dk/Public/Default.aspx?msg=ChooseDB&error=WrongParm)
+
+  #' 
+  #' @examples
+  #'RKKP_LYFO_CLEAN = RKKP_LYFO %>% clean_LYFO_DAMYDA()
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
   load_dataset(c('PATIENT'))
   data %>% 
     dplyr::rename(LDH_elevated = Reg_LDHVaerdi) %>% 
@@ -1407,18 +1520,26 @@ clean_RKKP_LYFO = function(data){
 
 
 clean_RKKP_LYFO_2024 = function(data){
+  #' Clean RKKP LYFO
+  #' 
+  #' @description Cleans (or translates) the dataset RKKP_LYFO. Works only for LYFO version 20 or higher. 
+  #' 
+  #' Binary variables are encoded as "Yes" = 1 and "No" = 0. 
+  #' Naming of variables is snake cased (spaces are replaced with _ and everything is lowercased if it is not an abbreviation)
+  #' Some variables are recorded in multiple forms (registration, treatment, relapse). When this is the case, a prefix indicates 
+  #' which form the variable is recorded from. If nothing else is stated the variable is from the registration form.
   
-  '
-  GENERAL RULES:
-  - binary variables are encoded as "Yes" = 1 and "No" = 0. 
-  - naming of variables is snake cased (spaces are replaced with _ and everything is lowercased if it is not an abbreviation)
-  - some variables are recorded in multiple forms (registration, treatment, relapse). When this is the case, a prefix indicates 
-    which form the variable is recorded from. If nothing else is stated the variable is from the registration form.
-  
-  NOTE: The documentation for this function does not contain all the information regarding the RKKP dataset.
-  If need be, check the documentation of the sourced RKKP data here: https://www.rkkp-dokumentation.dk/Public/Variable.aspx?db2=1000000785
-  
-  '
+  #' 
+  #' @note 
+  #' The documentation for this function does not contain all the information regarding the RKKP dataset.
+  #' If need be, check the documentation of the sourced RKKP data here: https://www.rkkp-dokumentation.dk/Public/Variable.aspx?db2=1000000785
+  #' 
+  #' @examples
+  #'RKKP_DAMYDA_CLEAN = RKKP_DAMYDA %>% clean_RKKP_LYFO_2024()
+
+  #' @export
+  #' @importFrom base paste 
+  #' 
   
   # list of all Reg_columns that shouldn't be recoded 
   do_not_recode_dx = c("Reg_Tumordiameter", 
@@ -1479,13 +1600,6 @@ clean_RKKP_LYFO_2024 = function(data){
   cols = cols[! cols %in% c('CPR_Opdat_dt')] # doesn't work for CPR_Opdat_dt for some reason
   
   data %>% 
-    # replace all empty strings with NA for all columns containing "Reg_Lokal" + "Reg_Sygdomslokal_extranodel" + "Reg_LDHVaerdi"
-    # and recode Y = Yes, N = No
-    # NOTE: Old Christian Code - why this?
-    # mutate(across(c(Reg_Sygdomslokal_extranodel, contains('Reg_Lokal'), Reg_LDHVaerdi), ~ ifelse(. %in% c(''), NA, .)),
-    #       across(c(Reg_Sygdomslokal_extranodel, contains('Reg_Lokal'), Reg_LDHVaerdi), ~ recode_factor(., 
-    #Y = 'Yes',
-    #N = 'No'))) %>% 
     # replace -1 and "" with NA for all columns
     mutate(across(all_of(cols), ~ifelse(.==-1|.==""|.=="none", NA, .))) %>% 
     
