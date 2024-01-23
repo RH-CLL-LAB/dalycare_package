@@ -1861,11 +1861,11 @@ clean_RKKP_LYFO_2024 = function(data){
               # date_treatment_2nd_line =  as.Date(Rec_KemoterapiStart_dt,  format = '%d/%m/%Y'), # Is this second line? What about Regime 2 in treatment?
               date_death = as.Date(CPR_Doedsdato,  format = '%d/%m/%Y'),
               date_last_FU = as.Date(CPR_Opdat_dt,  format = '%Y-%m-%d'),
-              treatment = ifelse(is.na(tx_date), 0, 1),
+              treatment = ifelse(is.na(date_treatment), 0, 1),
               treatment_planned_or_initiated = Reg_IvaerkPlantBehandling,
-              dead = ifelse(is.na(death_date), 0, 1),
-              death_last_FU_date = if_else(is.na(death_date), FU_date, death_date),
-              time_OS = diff_days(date_diagnosis, death_FU_date),
+              dead = ifelse(is.na(date_death), 0, 1),
+              death_last_FU_date = if_else(is.na(date_death), date_last_FU, date_death),
+              time_OS = diff_days(date_diagnosis, death_last_FU_date),
               
               # HOSPITAL IDS
               hospital = case_when( # taken from SHAK codes (https://sor-filer.sundhedsdata.dk/sor_produktion/data/shak/shakcomplete/shakcomplete.txt)
