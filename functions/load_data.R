@@ -5,7 +5,10 @@ source(constants.R)
 # This will cause everything using load dataset to not work. Has to be fixed and 
 # functionality using accessing the username and password needs to be implemented.
 
-load_dataset = function(dataset = NULL, value = NULL, column = 'patientid', user, password){
+user=""
+password=""
+
+load_dataset = function(dataset = NULL, value = NULL, column = 'patientid', user=user, password=password){
   #' load_dataset
   #'
   #' Loads datasets from the DALY-CARE database
