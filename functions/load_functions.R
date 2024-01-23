@@ -1619,9 +1619,9 @@ clean_RKKP_LYFO_2024 = function(data){
               
               
               # BINARY VARIABLES FOR WHETHER OR NOT REPORTS WERE SUBMITTED 
-              treatment_report_submitted = recode_factor(IND_Beh, 'Y' = 1, "N" = 0, .default = NA_real_),
-              relapse_report_submitted = recode_factor(IND_Relaps, 'Y' = 1, "N" = 0, .default = NA_real_),
-              FU_report_submitted = recode_factor(IND_FU, 'Y' = 1, "N" = 0, .default = NA_real_),
+              report_submitted_treatment = recode_factor(IND_Beh, 'Y' = 1, "N" = 0, .default = NA_real_),
+              report_submitted_relapse = recode_factor(IND_Relaps, 'Y' = 1, "N" = 0, .default = NA_real_),
+              report_submitted_FU = recode_factor(IND_FU, 'Y' = 1, "N" = 0, .default = NA_real_),
               
               # NUMBER OF AFFECTED NODAL / EXTRANODAL REGIONS 
               n_regions = ANTREG,
@@ -1679,10 +1679,10 @@ clean_RKKP_LYFO_2024 = function(data){
               erythrocyte_sedimentation_rate = Reg_Saenkning,
               
               # PROTOCOLS AND REGIMES
-              dx_patient_protocol = Reg_PatientProtokol,
+              patient_protocol_diagnosis = Reg_PatientProtokol,
               # relapse_patient_protocol = Rec_PatientProtokol - not available although it's in the documentation
               
-              dx_reason_not_in_protocol = recode_factor(Reg_UddybProtokol,`12` = "Declined by patient", `13` = "Declined by department", `14` = "Department does not offer protocol", `99` = "Unknown",.default = NA_character_),
+              reason_not_in_protocol_diagnosis = recode_factor(Reg_UddybProtokol,`12` = "Declined by patient", `13` = "Declined by department", `14` = "Department does not offer protocol", `99` = "Unknown",.default = NA_character_),
               
               # tx_reason_not_in_protocol = recode_factor(Beh_UddybProtokol, `12` = "Declined by patient", `13` = "Declined by department", `14` = "Department does not offer protocol", `99` = "Unknown",.default = NA_character_),
               
@@ -1690,86 +1690,86 @@ clean_RKKP_LYFO_2024 = function(data){
               
               # SHAK CODES 
               # dx_SHAK_resource_author = Reg_resource_author_SHAK,
-              tx_SHAK_resource_author = Beh_resource_author_SHAK,
+              SHAK_resource_author_treatment = Beh_resource_author_SHAK,
               # relapse_SHAK_resource_author = Rec_resource_author_SHAK,
               
               
               # TREATMENT VARIABLES
               register_despite_no_planned_treatment = Beh_AlligevelIndtastningTrods,
-              tx_chemo_treatment = Beh_ErDerForetagetKemo,
-              tx_maintenance_treatment = Beh_Vedligeholdelsesbehandling,
+              chemo_treatment_treatment = Beh_ErDerForetagetKemo,
+              maintenance_treatment_treatment = Beh_Vedligeholdelsesbehandling,
               
               
               # CHEMO THERAPY VARIABLES
-              tx_regime_1_chemo_type = Beh_Kemoterapiregime1,
-              tx_regime_1_cycles_length = Beh_CycluslaengdeReg1,
-              tx_regime_1_n_cycles = Beh_CyclusAntalReg1,
-              tx_regime_2_chemo_type = Beh_Kemoterapiregime2,
-              tx_regime_2_cycles_length = Beh_CycluslaengdeReg2,
-              tx_regime_2_n_cycles = Beh_CyclusAntalReg2,
-              tx_regime_3_chemo_type = Beh_Kemoterapiregime3,
-              tx_regime_3_cycles_length = Beh_CycluslaengdeReg3,
-              tx_regime_3_n_cycles = Beh_CyclusAntalReg3,
+              regime_1_chemo_type_treatment = Beh_Kemoterapiregime1,
+              regime_1_cycles_length_treatment = Beh_CycluslaengdeReg1,
+              regime_1_n_cycles_treatment = Beh_CyclusAntalReg1,
+              regime_2_chemo_type_treatment = Beh_Kemoterapiregime2,
+              regime_2_cycles_length_treatment = Beh_CycluslaengdeReg2,
+              regime_2_n_cycles_treatment = Beh_CyclusAntalReg2,
+              regime_3_chemo_type_treatment = Beh_Kemoterapiregime3,
+              regime_3_cycles_length_treatment = Beh_CycluslaengdeReg3,
+              regime_3_n_cycles_treatment = Beh_CyclusAntalReg3,
               
               # THERAPY VARIABLES
-              tx_disease_specific_AB = Beh_AndenLymfomspecifikBeh, # RKKPs documation here is somewhat lacking. For relapse with same variable name, the description is very different clinically
-              tx_steroid_monotherapy = Beh_StereoidSomMonoterapi,
-              tx_performance_status = Beh_PerformanceStatus,
-              tx_immunotherapy_type = Beh_Immunoterapi,
-              tx_n_immunotherapy_cycles = Beh_ImmunoterapiCyclusantal,
-              tx_concurrent_immuno_chemo = Beh_GivetSynkrontMedKemoterapi,
-              tx_RTx_type = Beh_Straaleterapi,
-              tx_RTx_n_fractions = Beh_AntalFraktioner,
-              tx_RTx_dosis_Gy = Beh_DosisIGray,
-              tx_RTx_dosis_mCkg = Beh_DosismCiKg,
-              tx_radio_immunotherapy_type = Beh_Radioimmunoterapi,
-              tx_high_dosis_treatment = Beh_Hoejdosisbehandling,
-              tx_response_evaluation = Beh_Responsevaluering,
-              tx_operation_type = Beh_Operationstype,
-              tx_operation_type_specified = Beh_SpecificerAndet_String,
-              tx_operation_date = as.Date(Beh_Operationsdato, format = '%d/%m/%Y'),
-              tx_ASCT_support_type = Beh_TypeAutologStamcellestoette,
-              tx_date_stem_cell_infusion = as.Date(Beh_Stamcelleinfusion_dt, format = '%d/%m/%Y'),
+              disease_specific_AB_treatment = Beh_AndenLymfomspecifikBeh, # RKKPs documation here is somewhat lacking. For relapse with same variable name, the description is very different clinically
+              steroid_monotherapy_treatment = Beh_StereoidSomMonoterapi,
+              performance_status_treatment = Beh_PerformanceStatus,
+              immunotherapy_type_treatment = Beh_Immunoterapi,
+              n_immunotherapy_cycles_treatment = Beh_ImmunoterapiCyclusantal,
+              concurrent_immuno_chemo_treatment = Beh_GivetSynkrontMedKemoterapi,
+              RTx_type_treatment = Beh_Straaleterapi,
+              RTx_n_fractions_treatment = Beh_AntalFraktioner,
+              RTx_dosis_Gy_treatment = Beh_DosisIGray,
+              RTx_dosis_mCkg_treatment = Beh_DosismCiKg,
+              radio_immunotherapy_type_treatment = Beh_Radioimmunoterapi,
+              high_dosis_treatment_treatment = Beh_Hoejdosisbehandling,
+              response_evaluation_treatment = Beh_Responsevaluering,
+              operation_type_treatment = Beh_Operationstype,
+              operation_type_specified_treatment = Beh_SpecificerAndet_String,
+              operation_date_treatment = as.Date(Beh_Operationsdato, format = '%d/%m/%Y'),
+              ASCT_support_type_treatment = Beh_TypeAutologStamcellestoette,
+              date_stem_cell_infusion_treatment = as.Date(Beh_Stamcelleinfusion_dt, format = '%d/%m/%Y'),
               
               
               # RELAPSE 
-              relapse_new_biopsy_performed = Rec_ErDerGennemfoertNyBiopsi,
-              relapse_WHOhistology_code = Rec_WHOHistologikode, #use CBs recoding scheme (snomed)
-              relapse_CNS_involvement_at_relapse = Rec_HavdePatientenCNS,
-              relapse_chemo_treatment = Rec_ErDerForetagetKemoterapi,
-              relapse_performance_status = Rec_Performancestatus,
-              relapse_response_evaluation = Rec_Responsevaluering,
-              relapse_response_evaluation_date = as.Date(Rec_Responsevaluering, format = '%d/%m/%Y'),
-              relapse_immunotherapy_type = Rec_Immunoterapi,
-              relapse_concurrent_immuno_chemo = Rec_GivetSynkrontMedKemoterapi,
+              new_biopsy_performed_relapse = Rec_ErDerGennemfoertNyBiopsi,
+              WHOhistology_code_relapse = Rec_WHOHistologikode, #use CBs recoding scheme (snomed)
+              CNS_involvement_relapse = Rec_HavdePatientenCNS,
+              chemo_treatment_relapse = Rec_ErDerForetagetKemoterapi,
+              performance_status_relapse = Rec_Performancestatus,
+              response_evaluation_relapse = Rec_Responsevaluering,
+              date_response_evaluation_relapse = as.Date(Rec_Responsevaluering, format = '%d/%m/%Y'),
+              immunotherapy_type_relapse = Rec_Immunoterapi,
+              concurrent_immuno_chemo_relapse = Rec_GivetSynkrontMedKemoterapi,
               # relapse_maintenance_treatment = Rec_Vedligeholdelsesbehandling - is in the documentation, but not available for us
-              relapse_maintenance_treatment_initiated = Rec_PaabegyndtVedligehold,
-              relapse_radio_immunotherapy_type = Rec_Radioimmunoterapi,
-              relapse_RTx_dosis_mCkg = Rec_DosisImCikg,
-              relapse_RTx_type = Rec_Straaleterapi,
-              relapse_RTx_dosis_Gy = Rec_DosisIGray,
-              relapse_RTx_n_fractions = Rec_AntalFraktioner,
-              relapse_operation_type = Rec_Operationstype,
-              relapse_operation_type_specified = Rec_SpeciferAndet_String,
-              relapse_operation_date = as.Date(Rec_Operationsdato, format = '%d/%m/%Y'),
-              relapse_disease_specific_HDT_with_ASCT = Rec_AndenLymfomspecifik, # RKKPs documentation is somewhat lacking here, we need to clarify what this means
-              relapse_high_dosis_treatment = Rec_Hoejdosisbehandling,
-              relapse_date_stem_cell_infusion = as.Date(Rec_Stamcelleinfusion_dt, format = '%d/%m/%Y'),
-              relapse_steroid_monotherapy = Rec_StereoidSomMonoterapi,
-              relapse_treatment_toxicity = Rec_Behtoksicitet,
-              relapse_immunotherapy_n_cycles = Rec_ImmunoterapiCyclusantal,
+              maintenance_treatment_initiated_relapse = Rec_PaabegyndtVedligehold,
+              radio_immunotherapy_type_relapse = Rec_Radioimmunoterapi,
+              RTx_dosis_mCkg_relapse = Rec_DosisImCikg,
+              RTx_type_relapse = Rec_Straaleterapi,
+              RTx_dosis_Gy_relapse = Rec_DosisIGray,
+              RTx_n_fractions_relapse = Rec_AntalFraktioner,
+              operation_type_relapse = Rec_Operationstype,
+              operation_type_specified_relapse = Rec_SpeciferAndet_String,
+              date_operation_relapse = as.Date(Rec_Operationsdato, format = '%d/%m/%Y'),
+              disease_specific_HDT_with_ASCT_relapse = Rec_AndenLymfomspecifik, # RKKPs documentation is somewhat lacking here, we need to clarify what this means
+              high_dosis_treatment_relapse = Rec_Hoejdosisbehandling,
+              date_stem_cell_infusion_relapse = as.Date(Rec_Stamcelleinfusion_dt, format = '%d/%m/%Y'),
+              steroid_monotherapy_relapse = Rec_StereoidSomMonoterapi,
+              treatment_toxicity_relapse = Rec_Behtoksicitet,
+              immunotherapy_n_cycles_relapse = Rec_ImmunoterapiCyclusantal,
               
               
               # RELAPSE CHEMO THERAPY VARIABLES
-              relapse_regime_1_chemo_type = Beh_Kemoterapiregime1,
-              relapse_regime_1_cycles_length = Beh_CycluslaengdeReg1,
-              relapse_regime_1_n_cycles = Beh_CyclusAntalReg1,
-              relapse_regime_2_chemo_type = Beh_Kemoterapiregime2,
-              relapse_regime_2_cycles_length = Beh_CycluslaengdeReg2,
-              relapse_regime_2_n_cycles = Beh_CyclusAntalReg2,
-              relapse_regime_3_chemo_type = Beh_Kemoterapiregime3,
-              relapse_regime_3_cycles_length = Beh_CycluslaengdeReg3,
-              relapse_regime_3_n_cycles = Beh_CyclusAntalReg3,
+              regime_1_chemo_type_relapse = Beh_Kemoterapiregime1,
+              regime_1_cycles_length_relapse = Beh_CycluslaengdeReg1,
+              regime_1_n_cycles_relapse = Beh_CyclusAntalReg1,
+              regime_2_chemo_type_relapse = Beh_Kemoterapiregime2,
+              regime_2_cycles_length_relapse = Beh_CycluslaengdeReg2,
+              regime_2_n_cycles_relapse = Beh_CyclusAntalReg2,
+              regime_3_chemo_type_relapse = Beh_Kemoterapiregime3,
+              regime_3_cycles_length_relapse = Beh_CycluslaengdeReg3,
+              regime_3_n_cycles_relapse = Beh_CyclusAntalReg3,
               
               # LOCATION OF LYMPHOMA
               
@@ -1845,30 +1845,30 @@ clean_RKKP_LYFO_2024 = function(data){
               
               
               # OUTCOMES AND DATES
-              dx_treatment_decision_date = as.Date(Reg_BehandlingBeslutning_dt, format='%d/%m/%Y'),
-              relapse_relapse_date = as.Date(Rec_RelapsProgressions_dt, format='%d/%m/%Y'),
-              tx_chemo_start_date =  as.Date(Beh_KemoterapiStart_dt,  format = '%d/%m/%Y'),
-              tx_chemo_end_date = as.Date(Beh_KemoterapiSlut_dt,  format = '%d/%m/%Y'),
-              tx_immuno_start_date =  as.Date(Beh_ImmunoterapiStart_dt,  format = '%d/%m/%Y'),
-              tx_immuno_end_date = as.Date(Beh_ImmunoterapiSlut_dt,  format = '%d/%m/%Y'),
-              tx_RTx_date = as.Date(Beh_StraaleterapiBehandlings_dt,  format = '%d/%m/%Y'),
-              tx_date = pmin(tx_chemo_start_date, tx_immuno_start_date, tx_RTx_date, na.rm = T),
-              relapse_chemo_start_date = as.Date(Rec_KemoterapiStart_dt,  format = '%d/%m/%Y'),
-              relapse_chemo_start_date = as.Date(Rec_KemoterapiSlut_dt,  format = '%d/%m/%Y'),
-              relapse_immuno_start_date = as.Date(Rec_ImmunoterapiStart_dt,  format = '%d/%m/%Y'),
-              relapse_immuno_end_date = as.Date(Rec_ImmunoterapiSlut_dt,  format = '%d/%m/%Y'),
-              relapse_RTx_date = as.Date(Rec_StraaleterapiBeh_dt,  format = '%d/%m/%Y'),
+              date_treatment_decision_diagnosis = as.Date(Reg_BehandlingBeslutning_dt, format='%d/%m/%Y'),
+              date_relapse = as.Date(Rec_RelapsProgressions_dt, format='%d/%m/%Y'),
+              date_chemo_start_treatment = as.Date(Beh_KemoterapiStart_dt,  format = '%d/%m/%Y'),
+              date_chemo_end_treatment = as.Date(Beh_KemoterapiSlut_dt,  format = '%d/%m/%Y'),
+              date_immuno_start_treatment =  as.Date(Beh_ImmunoterapiStart_dt,  format = '%d/%m/%Y'),
+              date_immuno_end_treatment = as.Date(Beh_ImmunoterapiSlut_dt,  format = '%d/%m/%Y'),
+              date_RTx_treatment = as.Date(Beh_StraaleterapiBehandlings_dt,  format = '%d/%m/%Y'),
+              date_treatment = pmin(date_chemo_start_treatment, date_immuno_start_treatment, date_RTx_treatment, na.rm = T),
+              date_chemo_start_relapse = as.Date(Rec_KemoterapiStart_dt,  format = '%d/%m/%Y'),
+              date_chemo_end_relapse = as.Date(Rec_KemoterapiSlut_dt,  format = '%d/%m/%Y'),
+              date_immuno_start_relapse = as.Date(Rec_ImmunoterapiStart_dt,  format = '%d/%m/%Y'),
+              date_immuno_end_relapse = as.Date(Rec_ImmunoterapiSlut_dt,  format = '%d/%m/%Y'),
+              date_RTx_relapse = as.Date(Rec_StraaleterapiBeh_dt,  format = '%d/%m/%Y'),
               # date_treatment_2nd_line =  as.Date(Rec_KemoterapiStart_dt,  format = '%d/%m/%Y'), # Is this second line? What about Regime 2 in treatment?
-              death_date = as.Date(CPR_Doedsdato,  format = '%d/%m/%Y'),
-              FU_date = as.Date(CPR_Opdat_dt,  format = '%Y-%m-%d'),
+              date_death = as.Date(CPR_Doedsdato,  format = '%d/%m/%Y'),
+              date_last_FU = as.Date(CPR_Opdat_dt,  format = '%Y-%m-%d'),
               treatment = ifelse(is.na(tx_date), 0, 1),
               treatment_planned_or_initiated = Reg_IvaerkPlantBehandling,
               dead = ifelse(is.na(death_date), 0, 1),
-              death_FU_date = if_else(is.na(death_date), FU_date, death_date),
+              death_last_FU_date = if_else(is.na(death_date), FU_date, death_date),
               time_OS = diff_days(date_diagnosis, death_FU_date),
               
               # HOSPITAL IDS
-              hospital_id = case_when( # taken from SHAK codes (https://sor-filer.sundhedsdata.dk/sor_produktion/data/shak/shakcomplete/shakcomplete.txt)
+              hospital = case_when( # taken from SHAK codes (https://sor-filer.sundhedsdata.dk/sor_produktion/data/shak/shakcomplete/shakcomplete.txt)
                 Org_rap == "1516230" ~ "HER",
                 Org_rap == "1301101" ~ "RH",
                 Org_rap == "4202560" ~ "OUH",
