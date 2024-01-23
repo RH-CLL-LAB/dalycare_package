@@ -4,17 +4,7 @@ source(constants.R)
 source(load_data.R)
 source(helpers.R)
 source(plotting.R)
-#### START with load_dataset ####
 
-Codes_ICD10 = Codes_DST_DIAG_CODES %>% 
-  transmute(Gyldig_fra = as_Date_from_seconds(`Gyldig fra`),
-            Gyldig_til= as_Date_from_seconds(`Gyldig til`),
-            icd10 = Kode,
-            Tekst)
-Codes_SNOMED = CODES_SNOMED %>% 
-  select(c_snomedkode = SKSkode, Text = Kodetekst)
-
-#### FUNCTIONS #### 
 
 clean_lab_values = function(data, NPU = NPU, value = value, unit = unit){
   #' Clean Lab Values
