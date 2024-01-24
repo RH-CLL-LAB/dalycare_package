@@ -63,15 +63,15 @@ load_dataset = function(dataset = NULL, value = NULL, column = 'patientid', user
 
 #### LOAD DATA ####
 load_npu_common = function() {
-  source('/ngc/projects2/dalyca_r/clean_r/NPU_codes.R') 
+  source(paste0(ngc_path, 'NPU_codes.R')) 
 }
 
 load_dalycare_dx = function() {
-  return(dx = read.csv2('/ngc/projects2/dalyca_r/clean_r/shared_projects/data/ALL_ICD10_AGGREGATE.csv'))
+  return(dx = read.csv2(paste0(ngc_path,'shared_projects/data/ALL_ICD10_AGGREGATE.csv')))
 }
 
 load_dalycare_dx_longformat = function() {
-  return(ALL_ICD10 = read_csv2('/ngc/projects2/dalyca_r/clean_r/shared_projects/data/ALL_ICD10.csv'))
+  return(ALL_ICD10 = read_csv2(paste0(ngc_path, 'shared_projects/data/ALL_ICD10.csv')))
 }
 
 
@@ -82,15 +82,15 @@ load_all_dx = function(){
 }
 
 load_PATIENT_OS = function(){
-  return(PATIENT_OS = read_csv2('/ngc/projects2/dalyca_r/clean_r/shared_projects/data/PATIENT_OS.csv'))
+  return(PATIENT_OS = read_csv2(paste0(ngc_path, 'shared_projects/data/PATIENT_OS.csv')))
 }
 
 load_bmi_SP = function() {
-  return(bmi = read.csv2('/ngc/projects2/dalyca_r/clean_r/shared_projects/data/ALL_BMI.csv'))
+  return(bmi = read.csv2(paste0(ngc_path, 'shared_projects/data/ALL_BMI.csv')))
 }
 
 load_blood_culture_SP = function() {
-  return(bsi = read.csv2('/ngc/projects2/dalyca_r/clean_r/shared_projects/data/BSI.csv'))
+  return(bsi = read.csv2(paste0(ngc_path, 'shared_projects/data/BSI.csv')))
 }
 
 load_common_biochemistry = function(labs = NULL, combine = FALSE) {
@@ -122,7 +122,7 @@ load_common_biochemistry = function(labs = NULL, combine = FALSE) {
     LAB = list()
   for(i in 1:length(labs)) {
     print(labs[i])
-    setwd('/ngc/projects2/dalyca_r/clean_r/shared_projects/data/')
+    setwd(paste0(ngc_path, 'shared_projects/data/'))
     LAB[[i]] = read.csv2(paste0(labs[i], '.csv')) %>% 
       mutate_all(~as.character(.)) %>% 
       mutate(patientid = as.numeric(patientid))
