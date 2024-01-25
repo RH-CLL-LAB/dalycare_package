@@ -190,3 +190,7 @@ ATCS = paste0('^', c('C03', 'C07A', 'C08', 'C09', 'C09XA',
                          'C02AB', 'C02AC', 'C02CA', 'G04CA', 'C02DB', 'C02DD'))
 
 ngc_path = "/ngc/projects2/dalyca_r/clean_r/"
+
+# user and password for accessing the data
+user=""
+password=""
