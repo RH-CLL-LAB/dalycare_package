@@ -268,14 +268,14 @@ clean_RKKP_LYFO = function(data){
               # Usually, doctors will report regime_1 as being the first chronological treatment,
               # but this is not a rule. 
               regime_1_chemo_type_2nd_line = Rec_Kemoterapiregime1,
-              regime_1_cycles_length_2nd_line = Rec_CycluslaengdeReg1,
-              regime_1_n_cycles_2nd_line = Rec_CyclusAntalReg1,
+              regime_1_cycles_length_2nd_line = Rec_Cycluslaengde1,
+              regime_1_n_cycles_2nd_line = Rec_Cyclusantal1,
               regime_2_chemo_type_2nd_line = Rec_Kemoterapiregime2,
-              regime_2_cycles_length_2nd_line = Rec_CycluslaengdeReg2,
-              regime_2_n_cycles_2nd_line = Rec_CyclusAntalReg2,
+              regime_2_cycles_length_2nd_line = Rec_Cycluslaengde2,
+              regime_2_n_cycles_2nd_line = Rec_Cyclusantal2,
               regime_3_chemo_type_2nd_line = Rec_Kemoterapiregime3,
-              regime_3_cycles_length_2nd_line = Rec_CycluslaengdeReg3,
-              regime_3_n_cycles_2nd_line = Rec_CyclusAntalReg3,
+              regime_3_cycles_length_2nd_line = Rec_Cycluslaengde3,
+              regime_3_n_cycles_2nd_line = Rec_Cyclusantal3,
               
               # LOCATION OF LYMPHOMA
               rhinopharynx_diagnosis = Reg_Lokal_Rhinopharynx, 
