@@ -7,9 +7,14 @@ AE_AKI = function(data, date = samplingdate, time = samplingtime, value = value,
 
   #' 
   #' @examples
-  #' load_data(“SDS_lab_forsker”, c(NPU.KREA), ”analysiscode”) #loads creatinine
-  #' CREATININE_clean = SDS_labforsker_subset %>% clean_lab_values() 
-  #' AKI = CREATININE_clean %>%  AE_AKI(value = value2)
+  #' COHORT = RKKP_LYFO %>% pull(patientid)
+  #' SDS_lab_forsker = load_dataset("SDS_lab_forsker", value = COHORT, column = "patientid")
+  #' # get only creatinine
+  #' SDS_lab_forsker = SDS_lab_forsker %>%
+  #'  filter(analysiscode == "NPU18016")
+
+  #' CREATININE_clean = SDS_lab_forsker %>% clean_lab_values(NPU = analysiscode)
+  #' AKI = CREATININE_clean %>% AE_AKI(value = value2)
   #' 
   #' @references Carrero JJ et al. Kidney Int. 2023 Jan;103(1):53-69.
 
@@ -19,9 +24,11 @@ AE_AKI = function(data, date = samplingdate, time = samplingtime, value = value,
   dat = data %>%
     select(patientid = {{patientid}}, samplingdate = {{date}}, samplingtime = {{time}}, result = {{value}}) %>% 
     left_join(PATIENT %>% select(patientid, date_birth)) %>% 
-    mutate(age_at_test = diff_days(date_birth, samplingdate),
-           date_time = as.numeric(seconds(as.POSIXct(paste(samplingdate, samplingtime)))),
-           i.scr_inhos = 0) %>%
+    mutate(
+      samplingdate = as.Date(as.POSIXct.numeric(samplingdate * 24 * 60 * 60, origin = "1970-01-01")),
+      age_at_test = diff_days(date_birth, samplingdate),
+      date_time = as.numeric(seconds(as.POSIXct(paste(samplingdate, samplingtime)))),
+      i.scr_inhos = 0) %>%
     select(cpr_enc = patientid, date_time, result, sampledate = samplingdate, age_at_test, i.scr_inhos) %>% 
     as.data.table() %>% 
     scr_low_48h() %>% 
