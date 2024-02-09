@@ -7,7 +7,7 @@ clean_RKKP_CLL = function(data){
 
   #' 
   #' @examples
-  #'RKKP_CLL_CLEAN = RKKP_CLL %>% clean_ RKKP_CLL()
+  #'RKKP_CLL_CLEAN = RKKP_CLL %>% clean_RKKP_CLL()
 
   #' @export
   #' @importFrom base paste 
