@@ -7,7 +7,7 @@ clean_RKKP_DAMYDA = function(data){
 
   #' 
   #' @examples
-  #'RKKP_DAMYDA_CLEAN = RKKP_DAMYDA %>% clean_ RKKP_DAMYDA()
+  #'RKKP_DAMYDA_CLEAN = RKKP_DAMYDA %>% clean_RKKP_DAMYDA()
 
   #' @export
   #' @importFrom base paste 
