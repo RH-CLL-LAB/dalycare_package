@@ -8,12 +8,12 @@ AE_AKI = function(data, date = samplingdate, time = samplingtime, value = value,
   #' 
   #' @examples
   #' COHORT = RKKP_LYFO %>% pull(patientid)
-  #' SDS_lab_forsker = load_dataset("SDS_lab_forsker", value = COHORT, column = "patientid")
+  #' load_dataset("SDS_lab_forsker", value = COHORT, column = "patientid")
   #' # get only creatinine
-  #' SDS_lab_forsker = SDS_lab_forsker %>%
+  #' SDS_lab_forsker_subset = SDS_lab_forsker_subset %>%
   #'  filter(analysiscode == "NPU18016")
 
-  #' CREATININE_clean = SDS_lab_forsker %>% clean_lab_values(NPU = analysiscode)
+  #' CREATININE_clean = SDS_lab_forsker_subset %>% clean_lab_values(NPU = analysiscode)
   #' AKI = CREATININE_clean %>% AE_AKI(value = value2)
   #' 
   #' @references Carrero JJ et al. Kidney Int. 2023 Jan;103(1):53-69.

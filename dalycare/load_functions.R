@@ -3,6 +3,11 @@ library(RPostgres)
 library(tidyverse)
 library(docstring)
 
+if (exists("user") & exists("password")){
+
+current_wd = getwd()
+setwd("/ngc/projects2/dalyca_r/clean_r/")
+
 # paths for all directories
 constants_path = "dalycare/constants/"
 helpers_path = "dalycare/helpers/"
@@ -26,3 +31,10 @@ lapply(helpers, function(helper) source(paste0(helpers_path, helper)))
 lapply(definitions, function(definition) source(paste0(definitions_path, definition)))
 lapply(cleaners, function(cleaner) source(paste0(cleaners_path, cleaner)))
 lapply(plotters, function(plotter) source(paste0(plotters_path, plotter)))
+
+setwd(current_wd)
+
+}
+else{
+    print("The DALYCARE package relies on access to the database. Please define username and password as variables in your environment.")
+}
