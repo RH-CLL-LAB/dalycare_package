@@ -4,7 +4,6 @@ library(tidyverse)
 library(docstring)
 
 if (exists("user") & exists("password")){
-
     current_wd = getwd()
     setwd("/ngc/projects2/dalyca_r/clean_r/")
 
