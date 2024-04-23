@@ -34,7 +34,7 @@ if (exists("user") & exists("password")){
 
     setwd(current_wd)
 
-}
+    }
 else{
     print("The DALYCARE package relies on access to the database. Please define username and password as variables in your environment.")
 }
