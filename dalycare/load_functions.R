@@ -2,7 +2,7 @@ message('\nLoading dalycare package...')
 library(RPostgres)
 library(tidyverse)
 library(docstring)
-# tommy
+
 if (exists("user") & exists("password")){
     
     current_wd = getwd()
