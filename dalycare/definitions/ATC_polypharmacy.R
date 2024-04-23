@@ -20,9 +20,10 @@ ATC_polypharmacy = function(data,
   #' @importFrom base paste 
   #' 
   
+  load_dataset('Codes_ATC')
   POLYPH = data %>% 
-    mutate(atc = substr({{atc}}, 1,3)) %>% 
-    left_join(Codes_ATC_CB %>% select(atc = class_code), by = 'atc', relationship = "many-to-many") %>% 
+    mutate(atc = substr({{atc}}, 1,{{level}})) %>% 
+    left_join(Codes_ATC %>% select(atc = class_code), by = 'atc', relationship = "many-to-many") %>% 
     transmute({{patientid}}, atc, value = 1) %>% 
     group_by({{patientid}}, atc) %>% 
     slice(1) %>% 
@@ -40,5 +41,5 @@ ATC_polypharmacy = function(data,
            ATC.group2 = cut(n.ATC, c(-Inf, 2,  4, 6, 8, 10, Inf), labels = c('0-2', '3-4', '5-6', '7-8', '9-10', '>10')),
            ATC.group3 = cut(n.ATC, c(-Inf, 4, 8,  Inf), labels = c('0-4', '5-8', '>9')),
            Polypharmacy = ifelse(n.ATC >= 5, 'Yes', 'No'))
-  
+  return(POLYPH2)
 }

@@ -1,4 +1,3 @@
-#### ggplot ####
 KM_plot = function(fit, fun = NULL, title = NULL, labs = NULL, xlab = 'Time (years)', ylab = '% alive', xlim = c(0,5),ylim = c(0,1), 
                    breaks = 1, palette = c(1, 2, 3, 4, 5, 6), pval = FALSE, pval.coord = c(0, 0.1)){
   ggsurvplot(fit = {{fit}}, 
@@ -120,9 +119,6 @@ tile_pairwise_survdiff = function(PAIRRR, digits = 3, position = NULL, labs = TR
     theme_void() +
     theme(legend.position = 'none')
 }
-
-
-#### COLORS ####
 
 Osborne.Ext = c('#DADEDF', '#A7AFB2', '#6F7C80', '#000000',
                 '#3C6478', '#0D3D56', '#0C374D', '#093145',

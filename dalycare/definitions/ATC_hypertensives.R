@@ -12,6 +12,8 @@ ATC_hypertensives <- function(data, atc) {
   #' @export
   #' @importFrom base paste 
   #' 
+    ATCS = paste0('^', c('C03', 'C07A', 'C08', 'C09', 'C09XA',
+                         'C02AB', 'C02AC', 'C02CA', 'G04CA', 'C02DB', 'C02DD'))
     data %>% 
       filter(str_detect({{atc}}, str_flatten(ATCS, '|'))) %>% 
       mutate(HTN.GROUP = ifelse(str_detect({{atc}}, '^C03'), 'Diuretics', NA),

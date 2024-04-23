@@ -11,6 +11,16 @@ ATC_AB <- function(data, atc) {
   #' @export
   #' @importFrom base paste 
   #' 
+    narrow = paste0('^', c("J01CE","J01CF","J01EA","J01EB","J01FA","J01XA","J01XC","J01XE","J01XD01","P01AB01","J01FF"))
+    broad = paste0('^', c("J01AA","J01CA","J01CR","J01M","J01DB","J01DC","J01DD","J01DH","J01EE","J01XX08","J01XX05"))
+    bactericidal = paste0('^', c("J01CE","J01CF","J01XA","J01CA","J01CR","J01M","J01XD01","P01AB01",
+                                 "J01DB","J01DC","J01DD","J01DH","J01XX08"))
+    bacteriostatic = paste0('^', c("J01EA","J01EB","J01FA","J01XC","J01XE","J01AA","J01EE","J01FF","J01XX05","J01BA"))
+    antiviral = "^J05A" 
+    antimycotics = "^J02A"
+    antihelminitics = "^P02C"
+    AB.ATC = c(narrow, broad, bactericidal, bacteriostatic, antiviral, antimycotics, antihelminitics) %>% unique
+    
     data %>%
       filter(str_detect({{atc}}, str_flatten(AB.ATC, '|'))) %>% 
       mutate(AB.GROUP = ifelse(str_detect({{atc}}, str_flatten(narrow, '|')), 'Narrow antibiotics', NA),

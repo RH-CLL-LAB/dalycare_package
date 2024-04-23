@@ -82,7 +82,7 @@ clean_RKKP_LYFO = function(data){
                      "Rec_Hoejdosisbehandling",
                      "Rec_StereoidSomMonoterapi")
   
-  load_dataset(c('PATIENT'))
+  load_dataset(c('patient'))
   cols = colnames(data) 
   cols = cols[! cols %in% c('CPR_Opdat_dt')] # doesn't work for CPR_Opdat_dt for some reason
   
@@ -106,7 +106,7 @@ clean_RKKP_LYFO = function(data){
                   subtype_icd10_2 = SUBTYPE_icd10) %>% 
     
     # Join with PATIENT table to get DOB and other demographic information
-    left_join(PATIENT, 'patientid') %>% 
+    left_join(patient, 'patientid') %>% 
     transmute(patientid = as.numeric(patientid),
               date_diagnosis = as.Date(Reg_DiagnostiskBiopsi_dt, format = '%d/%m/%Y'),
               age_diagnosis  = floor(diff_years(date_birth, date_diagnosis)), 

@@ -12,13 +12,12 @@ clean_RKKP_DAMYDA = function(data){
   #' @export
   #' @importFrom base paste 
   #' 
-  load_dataset(c('PATIENT'))
   data %>% 
     mutate(across(contains('Cyto_FishResultat'), ~ ifelse(is.na(.), 'N', .))) %>% 
     mutate(across(contains('Cyto_FishResultat'), ~ recode_factor(., 
                                                                  N = 'No',
                                                                  Y = 'Yes'))) %>% 
-    left_join(PATIENT, 'patientid') %>% 
+    left_join(patient, 'patientid') %>% 
     transmute(patientid,
               date_diagnosis = as.Date(Reg_Diagnose_dt, format = '%d/%m/%Y'),
               Age = diff_years(date_birth, date_diagnosis),
