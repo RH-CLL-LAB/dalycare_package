@@ -1,3 +1,7 @@
+# edit user and password to get access to the database
+user = ''
+password = ''
+
 databases = c('import-public', 'import-laboratory', 'core-public', 'core-curated', 
                 'import-_tables', 'import-_lookup_tables', 'core-_lookup_tables')
 LPR = c('SDS_t_mikro_ny_distinct', "SDS_t_mikro_ny", "SDS_t_konk_ny", 
