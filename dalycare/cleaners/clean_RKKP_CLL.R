@@ -12,9 +12,8 @@ clean_RKKP_CLL = function(data){
   #' @export
   #' @importFrom base paste 
   #' 
-  load_dataset(c('PATIENT', 'LAB_IGHVIMGT'))
   data %>% 
-    left_join(PATIENT, 'patientid') %>% #
+    left_join(patient, 'patientid') %>% #
     mutate(across(c(KMregisdoed ,Reg_FAMCLL,  Reg_KnoglemarvsUndersoegelse, Reg_ULSCANNING , Reg_CTSCANNING , Reg_LYMFOCYTFORDOBLIN ,
                     Reg_Umuteret , Reg_Del13q14, Reg_Trisomi12, Reg_Del11q , Reg_ZAP70, Reg_CD38Positiv, Reg_Beta2Microglobulin,
                     Reg_Del17p, Reg_TP53, Reg_Hypogammaglobulinami, Reg_Behandling , Beh_Anaemi, Beh_Thrombocytopeni,
@@ -49,7 +48,7 @@ clean_RKKP_CLL = function(data){
                                   M = 'Male',
                                   `F` = 'Female'),
               shak = Org_rap, 
-              hospital = recode_factor(Org_rap,
+              hospital_id = recode_factor(Org_rap,
                                           `1301101` = 'RH', 
                                           `1516230` = 'HER', 
                                           `2000228` = 'HIL',
@@ -91,7 +90,7 @@ clean_RKKP_CLL = function(data){
               FU_Doedsdato = as.Date(FU_Doedsdato,  format = '%d/%m/%Y'), #Wri!
               Rec_PatientProtokolAarsag,
               Charlson_Index) %>% 
-    left_join(LAB_IGHVIMGT %>% transmute(patientid = PATIENTID, IGHVIMGT = factor(IGHV)), 'patientid') %>% 
-    mutate(IGHV = if_else(is.na(IGHV), IGHVIMGT, IGHV)) %>% 
+    # left_join(LAB_IGHVIMGT %>% transmute(patientid, IGHVIMGT = factor(IGHV)), 'patientid') %>% 
+    # mutate(IGHV = if_else(is.na(IGHV), IGHVIMGT, IGHV)) %>% 
     CLL_IPI() 
 }

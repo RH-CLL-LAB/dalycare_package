@@ -60,7 +60,7 @@ filter_sentence = function(data, string = notat_text, pattern){
 
 censor_med_keep_first <- function(date, days_karens = 14){
   TH = days_karens/365.25
-  # input "date" as lubridate::date_decimal (class numeric)
+  cat('Uses input "date" as lubridate::date_decimal (class numeric)')
   date_diff = date - date  # initialize the output rep(0, times = length(date))
   
   date_default = date[1]
@@ -99,6 +99,17 @@ change_month <- function(x) {
   x <- gsub('NOV', '-11-', x)
   x <- gsub('DEC', '-12-', x)}
 
+slice_closest_value = function(data, date_baseline, date_value, interval_days = c(-90, 0), patientid = patientid, name = ''){
+  data %>% 
+    mutate(time = diff_days({{date_baseline}}, {{date_value}}),
+           time = ifelse(time >= {{interval_days}}[1], time, NA),
+           time = ifelse(time <= {{interval_days}}[2], time, NA)) %>%
+    group_by({{patientid}}) %>% 
+    arrange({{patientid}}, abs(time)) %>% 
+    slice(1) %>% 
+    ungroup() %>%
+    dplyr::rename("time{name}" := time)
+}
 
 ##### clean #####
 clear_ram = function(){
@@ -108,12 +119,43 @@ clear_ram = function(){
 clean_Date = as_Date_from_seconds
 # clean_Date_posix = function(date) {as.POSIXct(as.numeric(date)/86400, origin = '1970-01-01')}
 
-filter_first_DX = function(data, pattern){
-  data %>% 
-    filter_str_detect(DATE_DIAG, str_flatten({{pattern}}, '|')) %>% 
-    mutate(Date_first_diagnosis = str_split_fixed(DATE_DIAG, str_flatten(paste0('_', {{pattern}}), '|'), 2)[,1],
-           Date_first_diagnosis = str_sub(Date_first_diagnosis, -10, -1),
-           Date_first_diagnosis = as_date(Date_first_diagnosis))
+
+filter_first_diagnosis = function(data, diagnosis = NULL, str_contains = TRUE, multiple = 'first'){
+  # filters first occourence of any ICD10 diagnosis and adds KM years
+  # str_contains T diagnosis contained, str_contains F diagnosis matches 
+  # multiple may contain "first" (defualt) or "both" or "all" for which all multiple diagnoses most be present 
+  if(multiple == 'first'){
+    if(str_contains){print('contains')
+      data = data %>% 
+        filter_str_detect(diagnosis, {{diagnosis}})}
+    else{print('match')
+      data = data %>% 
+        filter(diagnosis %in% {{diagnosis}})}
+    print('slice(1)')
+    data =  data %>% 
+      group_by(patientid) %>% 
+      arrange(date_diagnosis) %>% 
+      slice(1) %>% 
+      ungroup() %>% 
+      left_join(patient, 'patientid') %>% 
+      mutate(time_dx_death = diff_years(date_diagnosis, date_death_fu)) %>% 
+      select(-priority)
+    return(data)
+  }
+  if(multiple %in% c('both', 'all') %>% sort(decreasing = T) %>% head(1)){print('multiple match')
+    data = data %>%
+      filter(diagnosis %in% {{diagnosis}}) %>% 
+      group_by(patientid, diagnosis) %>% 
+      mutate(n = paste0('DX', n())) %>% 
+      arrange(date_diagnosis) %>% 
+      ungroup() %>% 
+      group_by(patientid, diagnosis, n) %>% 
+      slice(1) %>% 
+      ungroup() %>% 
+      select(-n) %>% 
+      pivot_wider(names_from = diagnosis, values_from = date_diagnosis, names_prefix = 'icd10_') %>% 
+      left_join(patient, 'patientid') 
+  }
 }
 
 
