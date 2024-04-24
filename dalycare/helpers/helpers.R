@@ -489,3 +489,11 @@ RW_ISS = function(data,
            RW_ISS = cut(RWISS.score, c(-Inf, 2, 3, 4.5, Inf), labels = c('I', 'II', 'III', 'IV')))
   
 }
+
+
+print_data = function(data){
+  for(i in 1:length(names(data))){
+  print_color(paste0('\n', names(data)[i], ': '), 'red') 
+  print_color(paste0(data[,i][!is.na(data[,i])], collapse = ', '), 'blue')
+  }
+}
