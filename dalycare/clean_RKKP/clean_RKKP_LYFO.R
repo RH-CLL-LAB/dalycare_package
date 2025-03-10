@@ -28,6 +28,8 @@ clean_RKKP_LYFO = function(data){
   #' @examples
   #' RKKP_LYFO_CLEAN = RKKP_LYFO %>% clean_RKKP_LYFO()
   
+# CHANGED
+
   source('/ngc/projects2/dalyca_r/clean_r/clean_RKKP/clean_RKKP_LYFO_snomed.R')
   
   # list of all Reg_columns that shouldn't be recoded 
