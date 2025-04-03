@@ -36,7 +36,7 @@ clean_RKKP_CLL = function(data){
     mutate(across(c(KMregisdoed ,Reg_FAMCLL,  Reg_KnoglemarvsUndersoegelse, Reg_ULSCANNING , Reg_CTSCANNING , Reg_LYMFOCYTFORDOBLIN ,
                     Reg_Umuteret , Reg_Del13q14, Reg_Trisomi12, Reg_Del11q , Reg_ZAP70, Reg_CD38Positiv, Reg_Beta2Microglobulin,
                     Reg_Del17p, Reg_TP53, Reg_Hypogammaglobulinami, Reg_Behandling , Beh_Anaemi, Beh_Thrombocytopeni,
-                    Beh_Lymfadenopati, Beh_Splenomegali, Beh_StigendeLymfocytose , Beh_Leukocyttal,
+                    Beh_Lymfadenopati, Beh_Splenomegali, Beh_StigendeLymfocytose , 
                     Beh_LymfocytFordoblingstid, Beh_Vaegttab, Beh_Feber, Beh_UdtaltTraethed,
                     Beh_Nattesved, Beh_AndreFundSymptomer, Beh_Kemo_Fludarabin, Beh_Kemo_Chlorambucil, 
                     Beh_Kemo_Bendamustin, Beh_Kemo_other, Beh_Kemo_none, Beh_Immunterapi, 
@@ -51,14 +51,17 @@ clean_RKKP_CLL = function(data){
     mutate(across(c(KMregisdoed ,Reg_FAMCLL,  Reg_KnoglemarvsUndersoegelse, Reg_ULSCANNING , Reg_CTSCANNING , Reg_LYMFOCYTFORDOBLIN ,
                     Reg_Umuteret , Reg_Del13q14, Reg_Trisomi12, Reg_Del11q , Reg_ZAP70, Reg_CD38Positiv, Reg_Beta2Microglobulin,
                       Reg_Del17p, Reg_TP53, Reg_Hypogammaglobulinami, Reg_Behandling , Beh_Anaemi, Beh_Thrombocytopeni,
-                    Beh_Lymfadenopati, Beh_Splenomegali, Beh_StigendeLymfocytose , Beh_Leukocyttal,
+                    Beh_Lymfadenopati, Beh_Splenomegali, Beh_StigendeLymfocytose , 
+                    # Beh_Leukocyttal, # numeric
                     Beh_LymfocytFordoblingstid, Beh_Vaegttab, Beh_Feber, Beh_UdtaltTraethed,
                     Beh_Nattesved, Beh_AndreFundSymptomer, Beh_Kemo_Fludarabin, Beh_Kemo_Chlorambucil, 
                     Beh_Kemo_Bendamustin, Beh_Kemo_other, Beh_Kemo_none, Beh_Immunterapi, 
                     Beh_TargeteretBeh_Ibrutinib,  Beh_TargeteretBeh_acalabrutinib,
                     Beh_TargeteretBeh_idelalisib, Beh_TargeteretBeh_venetoclax,
                     Beh_FISH_TP53, Beh_Del17p, 
-                    Beh_TP53Mutation, Beh_PatientProtokol, Beh_PatientProtokolAarsag, Beh_MRD,
+                    Beh_TP53Mutation, Beh_PatientProtokol, 
+                    # Beh_PatientProtokolAarsag, 
+                    Beh_MRD,
                     Rec_FISH_TP53, Rec_Immunterapi, Rec_Kemo_Fludarabin, Rec_Kemo_Chlorambucil, 
                     Rec_Kemo_Bendamustin, Rec_Kemo_other, Rec_Kemo_none, Rec_PatientProtokol,  FU_PatientDoed,
                    FU_PatientAfsluttet), ~ recode_factor(., 
@@ -115,7 +118,7 @@ clean_RKKP_CLL = function(data){
               lymphadenopathy_at_treatment = Beh_Lymfadenopati, 
               splenomegaly_at_treatment  = Beh_Splenomegali, 
               lymphocytosis_at_treatment = Beh_StigendeLymfocytose , 
-              leukocytes_at_treatment = Beh_Leukocyttal,
+              leukocytes_at_treatment = ifelse(Beh_Leukocyttal == -1, NA, Beh_Leukocyttal),# 27/3-24
               LDT_at_treatment = Beh_LymfocytFordoblingstid, 
               weightloss_at_treatment = Beh_Vaegttab, 
               fever__at_treatment = Beh_Feber, 
@@ -156,7 +159,7 @@ clean_RKKP_CLL = function(data){
                                   `1` = 'Autologous',
                                   `2` = 'Allogeneic', #MA
                                   `3` = 'Allogeneic'), #NMA
-              date_transplant = dmy(Beh_TRANSPDATO),
+              date_transplant = Beh_TRANSPDATO,
               
               fludara_2nd_line = Rec_Kemo_Fludarabin,
               flud_2nd_line = ifelse(Rec_Kemo_Fludarabin =='Yes', 'Fludara', NA),
