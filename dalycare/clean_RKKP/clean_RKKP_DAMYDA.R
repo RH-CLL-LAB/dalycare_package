@@ -1,11 +1,20 @@
 
 clean_RKKP_DAMYDA = function(data){
-  load_dataset(c('patient', 'Codes_kommunekoder'))
+  #' @title
+  #' clean_RKKP_DAMYDA
+  #' @author
+  #' mikkel werling, christian brieghel
+  #' @description
+  #' Cleans RKKP DaMyDa v18 or higher (since 2024)
+  #' @examples
+  #' MM_clean = RKKP_DaMyDa %>% clean_RKKP_DAMYDA()
+  #' @references 
+  #' Gimsing et al. CLEP. 2016:8
+  #' https://db-dokumentation-sundk.dk/Public/
+  
+  if(!exists('patient')){load_dataset('patient')}
+  if(!exists('Codes_kommunekoder')){load_dataset('Codes_kommunekoder')}
   Codes_kommunekoder = Codes_kommunekoder %>% 
-    mutate(KOMMUNE = gsub('<f8>', 'ø', KOMMUNE),
-           KOMMUNE = gsub('<e6>', 'æ', KOMMUNE),
-           KOMMUNE = gsub('<c6>', 'Æ', KOMMUNE),
-           KOMMUNE = gsub('<e5>', 'å', KOMMUNE)) %>% 
     dplyr::rename(Kommunenr = KODE)
   source('/ngc/projects2/dalyca_r/clean_r/clean_RKKP/clean_RKKP_DAMYDA_snomed.R')
   
@@ -154,19 +163,26 @@ clean_RKKP_DAMYDA = function(data){
               FISH_11q = Cyto_FishResultat_11q22,
               FISH_other = Cyto_FishResultat_other,
               
-              
-             
               date_treatment_1st_line_start = ymd(PB_PrimaerbehandlingStart_dt),
               date_treatment_1st_line_end = ymd(PB_PrimaerbehandlingSlut_dt),
-              date_death = ymd(CPR_Doedsdato),
+              
+              date_HDT = ymd(PB_AutologeStamcellestoette_dt),
+              date_HDT2 = ymd(PB_AutologeStamcellestoette2_dt),
+              
+              date_treatment_2nd_line_start = ymd(SB_SekundaerBehandlingstart_dt),
+              
+              date_death = ymd(CPR_Doedsdato),# FU_Doed_dt # too many NAs compared with
               date_last_fu = ymd(CPR_Opdat_dt),
               date_death_fu = if_else(is.na(date_death), date_last_fu, date_death),
               treatment = ifelse(is.na(date_treatment_1st_line_start), 0, 1),
+              treatment_2nd_line = ifelse(is.na(date_treatment_2nd_line_start), 0, 1),
               dead = ifelse(is.na(date_death), 0, 1)) %>%  
-    mutate(date_treatment_fu = if_else(is.na(date_treatment_1st_line_start), date_death_fu, date_treatment_1st_line_start),
+    mutate(date_treatment_1st_fu = if_else(is.na(date_treatment_1st_line_start), date_death_fu, date_treatment_1st_line_start),
+           date_treatment_2nd_fu = if_else(is.na(date_treatment_2nd_line_start), date_death_fu, date_treatment_2nd_line_start),
            time_OS = diff_days(date_diagnosis, date_death_fu),
            time_to_death = time_OS,
-           time_to_treatment = diff_days(date_diagnosis, date_treatment_fu)) %>% 
+           time_to_treatment = diff_days(date_diagnosis, date_treatment_1st_fu),
+           time_1st_to_2nd_treatment = diff_days(date_treatment_1st_line_start, date_treatment_2nd_fu)) %>% 
     mutate(across(contains('FISH_'), ~if_else(FISHperformed == 'Yes' & is.na(.), 'No', .))) %>% 
     mutate(LDH_high = ifelse(age < 70 & LDH > 205, 'Yes', NA),
            LDH_high = ifelse(age < 70 & LDH <= 205, 'No', LDH_high),

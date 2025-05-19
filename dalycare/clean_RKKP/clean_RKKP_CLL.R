@@ -1,11 +1,14 @@
 # This script cleans RKKP_CLL version 18 or higher
-## See full RKKP documentation for the "CLL" register at www.rkkp-dokumentation.dk 
+## See full RKKP documentation for the "CLL" register at https://db-dokumentation-sundk.dk/Public/
 ## Depends on tidyverse and lubridate 
 ## Sys.Date() # "2024-08-24"
 ## Authors: Mikkel Werling, Thomas Lacoppidan and Christian Brieghel
 
 clean_RKKP_CLL = function(data){
-  #' Clean RKKP CLL
+  #' @title
+  #' clean_RKKP_CLL
+  #' @author
+  #' thomas lacoppidan, mikkel werling, christian brieghel
   #' 
   #' @description Cleans (or translates) the dataset RKKP_CLL aka the Danish CLL register (da Cunha-Bang et al. CLEP. 2016). 
   #' Works only for CLL version 18 or higher. 
@@ -18,17 +21,19 @@ clean_RKKP_CLL = function(data){
   #' IMPORTANT:
   #' For detailed explanation regarding the naming conventions used, please refer to the overall naming convention for DALYCARE (https://github.com/RH-CLL-LAB/.github/blob/main/naming_convention/DALYCARE_NAMING_CONVENTIONS.pdf).
   #' 
-  
-  #' 
   #' @note 
   #' Information on death and survival status is found in variables time_death_fu and dead.
   #' Most updated information on death and survival status should be extracted elsewhere (i.e. the "patient" table). 
   #' 
   #' The documentation for this function does not contain all the information regarding the RKKP dataset.
-  #' If need be, check the documentation of the sourced RKKP data here: https://www.rkkp-dokumentation.dk/
+  #' If need be, check the documentation of the sourced RKKP data here: https://db-dokumentation-sundk.dk/Public/
   #' 
   #' @examples
   #'RKKP_CLL_CLEAN = RKKP_CLL %>% clean_RKKP_CLL()
+  #'
+  #'@references 
+  #'https://db-dokumentation-sundk.dk/Public/
+  #'da Cunha-Bang et al. CLEP. 2016
   
   load_dataset('patient')
   data %>% 

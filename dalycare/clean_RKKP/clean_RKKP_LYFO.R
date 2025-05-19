@@ -1,8 +1,10 @@
 clean_RKKP_LYFO = function(data){
-  #' Clean RKKP LYFO
+  #' @title
+  #' clean_RKKP_LYFO
+  #' @author
+  #' mikkel werling, thomas lacoppidan, christian brieghel
   #' 
   #' @description Cleans (or translates) the dataset RKKP_LYFO. Works only for LYFO version 20 or higher. 
-  #' 
   #' Binary variables are encoded as "Yes" = 1 and "No" = 0. 
   #' Naming of variables is snake cased (spaces are replaced with _ and everything is lowercased if it is not an abbreviation)
   #' Some variables are recorded in multiple forms (registration, treatment, relapse). When this is the case, a suffix indicates 
@@ -12,7 +14,6 @@ clean_RKKP_LYFO = function(data){
   #' For detailed explanation regarding the naming conventions used, please refer to the overall naming convention for DALYCARE (https://github.com/RH-CLL-LAB/.github/blob/main/naming_convention/DALYCARE_NAMING_CONVENTIONS.pdf).
   #' 
   #' If nothing else is stated the variable is from the registration form.
-  
   #' 
   #' @note 
   #' Notes and specific comments are based on meetings with Peter Brown, who provided critical knowledge of what variables indicate.
@@ -23,13 +24,15 @@ clean_RKKP_LYFO = function(data){
   #' If patients are in W&W (as is often the case for FL and MZL), this is treated as 1st line of treatment.
   #' 
   #' The documentation for this function does not contain all the information regarding the RKKP dataset.
-  #' If need be, check the documentation of the sourced RKKP data here: https://www.rkkp-dokumentation.dk/Public/Variable.aspx?db2=1000000785
+  #' If need be, check the documentation of the sourced RKKP data here: https://db-dokumentation-sundk.dk/Public/
   #' 
   #' @examples
-  #' RKKP_LYFO_CLEAN = RKKP_LYFO %>% clean_RKKP_LYFO()
+  #' LYFO_CLEAN = RKKP_LYFO %>% clean_RKKP_LYFO()
+  #' @references 
+  #' https://db-dokumentation-sundk.dk/Public/
+  #' Arboe et al. CLEP. 2016 Oct 25:8:577-581
+  #' Arboe et al. PLoS One. 2016 Jun 23;11(6):e0157999
   
-# CHANGED
-
   source('/ngc/projects2/dalyca_r/clean_r/clean_RKKP/clean_RKKP_LYFO_snomed.R')
   
   # list of all Reg_columns that shouldn't be recoded 
@@ -86,7 +89,9 @@ clean_RKKP_LYFO = function(data){
                       "Rec_Hoejdosisbehandling",
                       "Rec_StereoidSomMonoterapi")
   
-  load_dataset('patient')
+  if(!exists('patient')){load_dataset('patient')}
+  if(!exists('Codes_kommunekoder')){load_dataset('Codes_kommunekoder')}
+  
   cols = colnames(data) 
   cols = cols[! cols %in% c('CPR_Opdat_dt')] # doesn't work for CPR_Opdat_dt for some reason
   
@@ -119,12 +124,14 @@ clean_RKKP_LYFO = function(data){
     
     # Join with PATIENT table to get DOB and other demographic information
     left_join(patient, 'patientid') %>% 
-    transmute(patientid = as.numeric(patientid),
+    left_join(Codes_kommunekoder %>% transmute(Kommunenr = as.character(KODE), kommune_home_address = KOMMUNE), 'Kommunenr') %>% 
+    transmute(patientid,
               date_diagnosis = dmy(Reg_DiagnostiskBiopsi_dt),
               age_diagnosis  = floor(diff_years(date_birth, date_diagnosis)), 
               sex = recode_factor(sex, 
                                   M = 'Male',
                                   `F` = 'Female'),
+              
               
               
               # BINARY VARIABLES FOR WHETHER OR NOT REPORTS WERE SUBMITTED 
@@ -135,11 +142,11 @@ clean_RKKP_LYFO = function(data){
               # NUMBER OF AFFECTED NODAL / EXTRANODAL REGIONS 
               n_regions_diagnosis = ANTREG,
               n_extranodal_regions_diagnosis = ENODAL,
-              AA_stage_diagnosis = factor(ifelse(Reg_Stadium==5, NA_integer_, Reg_Stadium),c(0, 1, 2, 3, 4)), # 5 is supposed to be "unsure due to missing diagnostic" - but often MDs often take the question to mean if they are unsure or not. 5 is therefore inconsistent and treated as NA.
+              AA_stage_diagnosis = factor(ifelse(Reg_Stadium==5, NA_integer_, Reg_Stadium),c(1, 2, 3, 4)), # 5 is supposed to be "unsure due to missing diagnostic" - but often MDs often take the question to mean if they are unsure or not. 5 is therefore inconsistent and treated as NA.
               
               # CLINICAL CHARACTERISTICS
               discordant_lymphoma_diagnosis = Reg_DiskordantLymfom, 
-              b_symptoms_diagnosis = Reg_BSymptomer,
+              b_symptoms_diagnosis = ifelse(Reg_BSymptomer == 0, 'A', 'B'), #22/4-22025
               PS_diagnosis = factor(Reg_PerformanceStatusWHO, c(0,1,2,3,4)),
               max_tumor_diameter_diagnosis = Reg_Tumordiameter, #Documentation says "max" in cm
               bulky_disease_diagnosis = Reg_BulkSygdom,
@@ -174,7 +181,9 @@ clean_RKKP_LYFO = function(data){
               B2M_nM_diagnosis = Reg_Beta2Microglobulin_nmL, #nanomolar
               B2M_diagnosis = ifelse(is.na(Reg_Beta2Microglobulin_mgL), Reg_Beta2Microglobulin_nmL*0.0118, Reg_Beta2Microglobulin_mgL), #combines two; converting nM
               LDH_diagnosis = Reg_Lactatdehydrogenase,
-              LDH_elevated_diagnosis = Reg_LDHVaerdi, 
+              LDH_elevated_diagnosis = recode_factor(Reg_LDHVaerdi, 
+                                                     `1` = 'Yes',
+                                                     `0` = 'No'),
               bilirubin_diagnosis = Reg_Bilirubin, 
               ALAT_diagnosis = Reg_ALAT,
               BASP_diagnosis = Reg_BasiskFosfatase, #BASP
@@ -203,6 +212,7 @@ clean_RKKP_LYFO = function(data){
               # SHAK CODES 
               # dx_SHAK_resource_author = Reg_resource_author_SHAK,
               SHAK_resource_1st_line = Beh_resource_author_SHAK,
+              kommune_home_address,
               hospital_for_primary_register = recode(Beh_resource_author_SHAK,
                                                         `1301101` = "RH",
                                                         `1516230` = "HERLEV",
@@ -274,7 +284,7 @@ clean_RKKP_LYFO = function(data){
               PS_1st_line = Beh_PerformanceStatus,
               immunotherapy_type_1st_line = recode(Beh_Immunoterapi,
                                                    `\032Glofitamab`= 'glofitamab'),
-              immunotherapy_n_cycles_1st_line = Beh_ImmunoterapiCyclusantal,
+              n_immunotherapy_cycles_1st_line = Beh_ImmunoterapiCyclusantal,
               concurrent_immuno_chemo_1st_line = Beh_GivetSynkrontMedKemoterapi,
               RT_type_1st_line = Beh_Straaleterapi,
               RT_n_fractions_1st_line = Beh_AntalFraktioner,
@@ -294,11 +304,13 @@ clean_RKKP_LYFO = function(data){
               # 2ND LINE TREATMENT VARIABLES 
               new_biopsy_performed_2nd_line = Rec_ErDerGennemfoertNyBiopsi,
               WHOhistology_code_2nd_line = Rec_WHOHistologikode, #use CBs recoding scheme (snomed)
-              CNS_involvement_2nd_line = Rec_HavdePatientenCNS,
+              CNS_involvement_2nd_line = recode_factor(Rec_HavdePatientenCNS,
+                                                       `1` = 'Yes',
+                                                       `0` = 'No'),
               chemo_treatment_2nd_line = Rec_ErDerForetagetKemoterapi,
               PS_2nd_line = Rec_Performancestatus,
               ASCT_2nd_line = Rec_Hoejdosisbehandling,
-              # date_ASCT_2nd_line = dmy(Rec_Stamcelleinfusion_dt),
+              date_ASCT_2nd_line = dmy(Rec_Stamcelleinfusion_dt),
               response_2nd_line = recode(Rec_Responsevaluering,
                                                     Cru = 'CRu'), #CB
               date_response_2nd_line = dmy(Rec_Responsevaluering_dt), #CB
@@ -397,7 +409,9 @@ clean_RKKP_LYFO = function(data){
               muscle_diagnosis = Reg_Lokal_Muskulatur,   
               bones_diagnosis = Reg_Lokal_Knogler, 
               CNS_diagnosis = Reg_Lokal_CNS, 
-              CNS_involvement_diagnosis = CNSs, 
+              CNS_involvement_diagnosis = recode_factor(CNSs,
+                                                        Y = 'Yes',
+                                                        N = 'No'), 
               leptomeninges_diagnosis = Reg_Lokal_Leptomeninges,
               
               # PROGNOSTIC INDICES
@@ -466,6 +480,7 @@ clean_RKKP_LYFO = function(data){
     clean_RKKP_LYFO_snomed(WHOhistology_code_2nd_line) #check!
 }
 
+# docstring(clean_RKKP_LYFO)
 # RKKP_LYFO_clean = RKKP_LYFO %>%
 #   clean_RKKP_LYFO()
 # RKKP_LYFO_clean$bone_marrow_diagnosis %>% table(exclude =NULL)
