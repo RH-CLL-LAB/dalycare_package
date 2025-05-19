@@ -2,14 +2,14 @@ AE_ASAT_increased = function(data,
                              c_value = c_value, 
                              analysiscode = analysiscode,
                              referenceinterval_upperlimit = referenceinterval_upperlimit,
-                             date_baseline = NA){
+                             date_sample = samplingdate){
   #' @title
   #' AE_ASAT_increased
   #' @author
   #' christian brieghel
   #' @description
   #' Calculates aspartate transaminase (AST [eng] or ASAT [dan]) values to define AE ASAT increased (MedDRA 10003481)
-  #' @example
+  #' @examples
   #' load_dataset('laboratorymeasurements', sample(patient$patientid, 2000))
   #' AE_data = laboratorymeasurements_subset %>% AE_ASAT_increased()
   #' @references 
@@ -21,11 +21,12 @@ AE_ASAT_increased = function(data,
            !is.na({{c_value}})) %>% 
     mutate(value_numeric = as.numeric({{c_value}}),
            ULN = as.numeric({{referenceinterval_upperlimit}}),
-           ULN = ifelse(is.na(ULN), 45, ULN),
-           value_baseline = ifelse(samplingdate < {{date_baseline}}, value_numeric, NA)) %>% 
-    group_by(patientid) %>% 
-    mutate(value_baseline_mean = mean(value_baseline),
-           BL_status = ifelse(value_baseline_mean <= ULN, 'normal', 'abnormal')) %>% 
+           ULN = ifelse(is.na(ULN), 45, ULN)) %>% 
+    group_by(patientid) %>%
+    arrange(patientid, {{date_sample}}) %>%
+    mutate(value_baseline_mean = lag(cummean(value_numeric))) %>% 
+    ungroup() %>% 
+    mutate(BL_status = ifelse(value_baseline_mean <= ULN | is.na(value_baseline_mean), 'normal', 'abnormal')) %>% 
     mutate(ae_ASAT_increased = ifelse(BL_status=='normal' & value_numeric <= ULN, '0', NA),
            ae_ASAT_increased = ifelse(BL_status=='normal' & value_numeric > ULN, '1', ae_ASAT_increased),
            ae_ASAT_increased = ifelse(BL_status=='normal' & value_numeric > ULN*3, '2', ae_ASAT_increased),
