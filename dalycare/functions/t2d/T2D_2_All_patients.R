@@ -5,8 +5,6 @@ source("/ngc/projects2/dalyca_r/clean_r/load_dalycare_package.R")
 load_dataset(c("view_diagnoses_all_distinct", "PATIENT_clean", "SDS_ekokur", "view_definition_first_diagnosis_malignant", "SDS_epikur" ))
 
 setwd("/ngc/projects2/dalyca_r/casfre_r/definitions/T2D/")
-#save.image("/ngc/projects2/dalyca_r/casfre_r/definitions/T2D/data/T2D3.RData")
-#load('/ngc/projects2/dalyca_r/casfre_r/definitions/T2D/data/T2D3.RData')
 
 SDS_ekokur <- SDS_ekokur %>% select(patientid, eksd, atc)
 SDS_epikur <- SDS_epikur %>% select(patientid, eksd, atc)
