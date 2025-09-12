@@ -265,7 +265,8 @@ SKS.MPN_treatment = c(SKS.hydrea, SKS.anagrelid, SKS.busulfan,
 SKS.CML_treatment = c(SKS.imatinib, SKS.dasatinib, SKS.bosutinib, SKS.nilotinib, SKS.asciminib)
 
 #### All hem-cancer ####
-SKS.hemtological_cancers = c(SKS.MM_treatment, SKS.CLL_treatment, SKS.Lymphoma_treatment, SKS.ALL_treatment, 
+SKS.hematological_cancers = c(SKS.MM_treatment, SKS.CLL_treatment, SKS.Lymphoma_treatment, SKS.ALL_treatment, 
                              SKS.AML_curative_treatment, SKS.AML_palliative_treatment, SKS.MDS_treatment,
                              SKS.MPN_treatment, SKS.CML_treatment) %>% unique() %>% sort()
+
 # END OF SCRIPT
