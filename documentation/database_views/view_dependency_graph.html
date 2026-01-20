@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DALYCARE Database Views - Dependency Graph</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .diagram-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .legend-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .legend-title {
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .layer1 { background: #4ade80; }
+        .layer2 { background: #fbbf24; }
+        .layer3 { background: #60a5fa; }
+        .layer4 { background: #c084fc; }
+        .base { background: #94a3b8; }
+        .legend-text {
+            color: #b0b0b0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .info-section {
+            margin-top: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .info-section h2 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .info-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .info-card h3 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .info-card p {
+            color: #a0a0a0;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DALYCARE Database Views</h1>
+        <p class="subtitle">Dependency Graph and Data Flow Architecture</p>
+        
+        <div class="diagram-container">
+            <div class="mermaid">
+flowchart TB
+    subgraph Sources["📊 Source Systems"]
+        direction LR
+        SDS["SDS Tables\n(t_adm, t_diag, t_tumor,\nt_dodsaarsag, kontakter, pato)"]
+        SP["SP Tables\n(ADT_haendelser,\nBehandlingskontakter)"]
+        RKKP["RKKP Registries\n(LYFO, CLL, DaMyDa)"]
+        PAT["Patient Master\n(pending.patient)"]
+        LOOKUP["Lookup Tables\n(SNOMED↔ICD10)"]
+    end
+
+    subgraph Layer1["🟢 Layer 1: Foundation Views"]
+        direction LR
+        VDA["view_diagnosses_all\n━━━━━━━━━━━━━━━━━\nConsolidates all diagnoses\nfrom multiple sources"]
+        VDAHR["view_diagnoses_all\n_hosp_region\n━━━━━━━━━━━━━━━━━\nDiagnoses with geographic info"]
+        VDD["view_date_death\n━━━━━━━━━━━━━━━━━\nAggregates death dates\nfrom all sources"]
+        VDF["view_date_followup\n━━━━━━━━━━━━━━━━━\nCollects follow-up dates\nfor living patients"]
+    end
+
+    subgraph Layer2["🟡 Layer 2: Transformation Views"]
+        direction LR
+        VTDD["view_true_date_death\n━━━━━━━━━━━━━━━━━\nDetermines authoritative\ndeath date via priority cascade"]
+        VDCD["view_dalycare_diagnoses\n━━━━━━━━━━━━━━━━━\nFilters to adult patients\nwith hematological malignancies"]
+    end
+
+    subgraph Layer3["🔵 Layer 3: Integration Views"]
+        VPTOS["view_patient_table_os\n━━━━━━━━━━━━━━━━━\nPatient table with\noverall survival endpoints"]
+    end
+
+    subgraph Layer4["🟣 Layer 4: Final Output"]
+        VCPT["view_create_patient_table\n━━━━━━━━━━━━━━━━━\nFinal cohort table for\nDALYCARE analysis"]
+    end
+
+    %% Source to Layer 1 connections
+    SDS --> VDA
+    SDS --> VDAHR
+    SDS --> VDD
+    SDS --> VDF
+    SP --> VDA
+    SP --> VDAHR
+    SP --> VDD
+    SP --> VDF
+    RKKP --> VDA
+    RKKP --> VDAHR
+    RKKP --> VDD
+    RKKP --> VDF
+    LOOKUP --> VDA
+    LOOKUP --> VDAHR
+    PAT --> VDD
+    PAT --> VDF
+
+    %% Layer 1 to Layer 2
+    VDA --> VDCD
+    VDD --> VTDD
+    PAT --> VDCD
+
+    %% Layer 2 to Layer 3
+    VTDD --> VPTOS
+    VDF --> VPTOS
+    PAT --> VPTOS
+
+    %% Layer 3 to Layer 4
+    VPTOS -.-> VCPT
+    VDCD -.-> VCPT
+
+    %% Styling
+    classDef sourceStyle fill:#374151,stroke:#6b7280,stroke-width:2px,color:#fff
+    classDef layer1Style fill:#166534,stroke:#22c55e,stroke-width:2px,color:#fff
+    classDef layer2Style fill:#854d0e,stroke:#eab308,stroke-width:2px,color:#fff
+    classDef layer3Style fill:#1e40af,stroke:#3b82f6,stroke-width:2px,color:#fff
+    classDef layer4Style fill:#6b21a8,stroke:#a855f7,stroke-width:2px,color:#fff
+
+    class SDS,SP,RKKP,PAT,LOOKUP sourceStyle
+    class VDA,VDAHR,VDD,VDF layer1Style
+    class VTDD,VDCD layer2Style
+    class VPTOS layer3Style
+    class VCPT layer4Style
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color base"></span>
+                    Source Systems
+                </div>
+                <div class="legend-text">
+                    Raw data tables from SDS (national health data), SP (hospital EHR), 
+                    RKKP (clinical quality registries), and lookup tables for code mapping.
+                </div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color layer1"></span>
+                    Layer 1: Foundation
+                </div>
+                <div class="legend-text">
+                    Aggregation views that consolidate data from multiple source systems 
+                    into standardized formats. These are the building blocks for all downstream views.
+                </div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color layer2"></span>
+                    Layer 2: Transformation
+                </div>
+                <div class="legend-text">
+                    Apply business rules: determine authoritative death dates, 
+                    filter to adult patients with specific hematological malignancy diagnoses.
+                </div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color layer3"></span>
+                    Layer 3: Integration
+                </div>
+                <div class="legend-text">
+                    Combine patient demographics with survival endpoints 
+                    to create analysis-ready datasets suitable for research queries.
+                </div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-title">
+                    <span class="legend-color layer4"></span>
+                    Layer 4: Final Output
+                </div>
+                <div class="legend-text">
+                    The final patient table filtered to the DALYCARE cohort, 
+                    ready for survival analysis and clinical research.
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>View Descriptions</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>view_diagnosses_all</h3>
+                    <p>Consolidates diagnosis data from all available Danish health registries (SDS, SP, RKKP, PATO) 
+                    into a unified format with patient ID, diagnosis date, ICD-10 code, source table, and data quality priority.</p>
+                </div>
+                <div class="info-card">
+                    <h3>view_diagnoses_all_hosp_region</h3>
+                    <p>Extended version of view_diagnosses_all that preserves hospital and region identifiers 
+                    for geographic analysis of diagnoses across Danish health regions.</p>
+                </div>
+                <div class="info-card">
+                    <h3>view_date_death</h3>
+                    <p>Aggregates death date information from all sources (SP, SDS, RKKP registries) 
+                    with source-specific columns and a preliminary true_date_death calculation.</p>
+                </div>
+                <div class="info-card">
+                    <h3>view_date_followup</h3>
+                    <p>Collects the most recent follow-up date from each data source for living patients, 
+                    using CPR update dates and maximum death dates as censoring endpoints.</p>
+                </div>
+                <div class="info-card">
+                    <h3>view_true_date_death</h3>
+                    <p>Applies a priority cascade to determine the authoritative death date. 
+                    RKKP registries take precedence over SP and SDS for hematological patients.</p>
+                </div>
+                <div class="info-card">
+                    <h3>view_dalycare_diagnoses</h3>
+                    <p>Filters to adult patients (≥18 at diagnosis) with specific hematological malignancy codes 
+                    (DC81-DC91, specific leukemia and plasma cell disorder codes). Excludes pediatric-onset cases.</p>
+                </div>
+                <div class="info-card">
+                    <h3>view_patient_table_os</h3>
+                    <p>Patient-level table with overall survival endpoints: demographics, death date, vital status (0/1), 
+                    and follow-up date. Suitable for survival analysis using Kaplan-Meier and Cox regression.</p>
+                </div>
+                <div class="info-card">
+                    <h3>view_create_patient_table</h3>
+                    <p>Final patient table restricted to DALYCARE cohort members. Provides unified date_death_fu column 
+                    combining death and follow-up dates for simplified survival analysis workflows.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#4f46e5',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#6366f1',
+                lineColor: '#6b7280',
+                secondaryColor: '#374151',
+                tertiaryColor: '#1f2937',
+                fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 50,
+                rankSpacing: 80
+            }
+        });
+    </script>
+</body>
+</html>
