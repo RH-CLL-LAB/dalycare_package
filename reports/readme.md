@@ -1,3 +1,4 @@
-2025-06-10 
+2026-01-20 
 
-These reports are updated when DALY-CARE is updated with new data.
+These reports are updated whenever we receive new data (Sundhedsplatformen, Sundhedsdatastyrelsen og SundK/RKKP) for DALY-CARE.
+
