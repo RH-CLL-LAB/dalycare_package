@@ -1,7 +1,7 @@
 
 RKKP & SP update. 
 
-Due to scripting "error" some statistics are missing (see reports)
+A few graphs are missing (see reports)
 
 
 
